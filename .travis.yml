@@ -6,7 +6,7 @@ services:
 
 env:
   global:
-    - PI_APP=datacollector-rpi3
+    - PI_APP=clima-datacollector-rpi3
 script:
 - docker pull migruiz/$PI_APP || true
 - docker build --cache-from migruiz/$PI_APP  -t migruiz/$PI_APP . || travis_terminate 1
