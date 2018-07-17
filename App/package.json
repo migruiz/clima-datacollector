@@ -1,0 +1,19 @@
+{
+  "name": "file-monitor",
+  "version": "0.0.0",
+  "description": "FileMonitor",
+  "main": "server.js",
+  "author": {
+    "name": "piscos"
+  },
+  "dependencies": {
+    "amqplib": "^0.5.1",
+    "asyncawait": "^1.0.0",
+    "inotify": "^1.4.2",
+    "locks": "^0.2.2",
+    "mz": "^2.7.0",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "sqlite3": "^3.1.13"
+  }
+}
