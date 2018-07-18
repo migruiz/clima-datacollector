@@ -38,7 +38,7 @@ var singleton = (function () {
     function createInstance() {
 
         var sqlite3 = require('sqlite3').verbose();
-        var db = new sqlite3.Database('/NodeFileMonitor/test.sqlite');
+        var db = new sqlite3.Database('/App/test.sqlite');
         //var db = new sqlite3.Database('D:\\Documents\\valves.sqlite');
         var mutex = locks.createMutex();
         return { db: db, mutex: mutex };
