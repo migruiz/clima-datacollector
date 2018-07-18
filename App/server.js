@@ -27,9 +27,9 @@ var sensors = {
 };
 
 
-firebaseSyncReceiver.startMonitoring('amqp://pi:pi@localhost');
+firebaseSyncReceiver.startMonitoring(process.env.TEMPQUEUEURL);
 
-oregonSensorReceiver.startMonitoring('amqp://pi:pi@localhost', onOregonContentReceivedAsync);
+oregonSensorReceiver.startMonitoring(process.env.TEMPQUEUEURL, onOregonContentReceivedAsync);
 console.log('listenging now');
 function onOregonContentReceivedAsync(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);

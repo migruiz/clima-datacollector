@@ -22,6 +22,6 @@ RUN [ "cross-build-end" ]
 
 
 
-
+ENV TEMPQUEUEURL amqp://pi:pi@192.168.0.96
 
 ENTRYPOINT ["node","/App/server.js"]
