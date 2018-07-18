@@ -49,10 +49,10 @@ function Sensor(sensorCode) {
     }
     function reportReadingAsync(sensorReading) {
         await(sqliteRepository.insertReadingAsync(sensorReading));
-        sendChangeToFirebasSync('amqp://pi:pi@localhost', sensorReading);
+        sendChangeToFirebasSync(process.env.TEMPQUEUEURL, sensorReading);
         var zonesReadings = await(sqliteRepository.getCurrentReadingsAsync());
         var request = { timestamp: Math.floor(new Date() / 1000), zoneReading: sensorReading };
-        reportCurrentZoneReading('amqp://pi:pi@localhost', request);
+        reportCurrentZoneReading(process.env.TEMPQUEUEURL, request);
     }
 
     function safeProcessNewReading(sensorReading,piId) {
