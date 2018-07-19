@@ -1,10 +1,7 @@
-var amqp = require('amqplib');
 var fileReadingExtractor = require('./fileReadingExtractor.js');
-var firebaseSyncReceiver = require('./firebaseSyncReceiver.js');
-var async = require('asyncawait/async');
-var await = require('asyncawait/await');
+//var firebaseSyncReceiver = require('./firebaseSyncReceiver.js');
 var oregonSensorReceiver = require('./oregonSensorReceiver.js');
-var sensorsCreator = require('./sensor.js');
+//var sensorsCreator = require('./sensor.js');
 
 global.map = {
     BC: "masterroom",
@@ -16,20 +13,20 @@ global.map = {
     E9: "livingroom"
 };
 
-var sensors = {
-    masterroom: sensorsCreator.newInstance("masterroom"),
-    entrance: sensorsCreator.newInstance("entrance"),
-    secondbedroom: sensorsCreator.newInstance("secondbedroom"),
-    computerroom: sensorsCreator.newInstance("computerroom"),
-    outside: sensorsCreator.newInstance("outside"),
-    masterbathroom: sensorsCreator.newInstance("masterbathroom"),
-    livingroom: sensorsCreator.newInstance("livingroom")
-};
+//var sensors = {
+//    masterroom: sensorsCreator.newInstance("masterroom"),
+//    entrance: sensorsCreator.newInstance("entrance"),
+//    secondbedroom: sensorsCreator.newInstance("secondbedroom"),
+//    computerroom: sensorsCreator.newInstance("computerroom"),
+//    outside: sensorsCreator.newInstance("outside"),
+//    masterbathroom: sensorsCreator.newInstance("masterbathroom"),
+//    livingroom: sensorsCreator.newInstance("livingroom")
+//};
 
 
-firebaseSyncReceiver.startMonitoring(process.env.TEMPQUEUEURL);
+//firebaseSyncReceiver.startMonitoring(process.env.TEMPQUEUEURL);
 
-oregonSensorReceiver.startMonitoring(process.env.TEMPQUEUEURL, onOregonContentReceivedAsync);
+oregonSensorReceiver.startMonitoring('mqtt://localhost', onOregonContentReceivedAsync);
 console.log('listenging now');
 function onOregonContentReceivedAsync(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);
@@ -41,8 +38,8 @@ function onOregonContentReceivedAsync(content) {
         console.log("cound find: " + sensorReading.zoneCode);
         return;
     }
-    var sensor = sensors[sensorReading.zoneCode];
-    sensor.processNewReadingAsync(sensorReading, rpId);
+    console.log(sensorReading);
+    //sensor.processNewReadingAsync(sensorReading, rpId);
 }
 
 
