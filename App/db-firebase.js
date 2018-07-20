@@ -92,10 +92,10 @@ exports.updateFirebaseAsync = async function (reading) {
     }
 
     async function notifySensorDidNotTransmitAsync(zoneCode) {
-        var currentCoverage = await getCurrentZoneCoverageAsync(myZoneCode);
+        var currentCoverage = await getCurrentZoneCoverageAsync(zoneCode);
         var newCoverage = currentCoverage + '0';
         newCoverage = newCoverage.substring(newCoverage.length - 5, newCoverage.length);
-        await updateNewCoverageAsync(myZoneCode, newCoverage);
+        await updateNewCoverageAsync(zoneCode, newCoverage);
 
     }
 
