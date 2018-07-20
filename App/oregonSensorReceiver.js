@@ -1,13 +1,11 @@
-﻿var mqtt = require('mqtt')
+﻿var mqttCluster = require('./mqttCluster.js').cluster();
 
 
-exports.startMonitoring =function (mqttServer, onOregonContentReceivedAsync) {
+exports.startMonitoring =function (onOregonContentReceivedAsync) {
 
-
-    var client = mqtt.connect(mqttServer);
-    client.on('connect', () => client.subscribe('sensorReading'));
-    client.on('message', function (topic, message) {
+    mqttCluster.subscribe('sensorReading', message => {
         var oregonContent = JSON.parse(message);
         onOregonContentReceivedAsync(oregonContent);
-    })
+    });
+
 }

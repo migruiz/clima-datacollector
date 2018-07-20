@@ -32,6 +32,7 @@
     <Compile Include="db-firebase.js" />
     <Compile Include="db-sqlite.js" />
     <Compile Include="firebaseSyncReceiver.js" />
+    <Compile Include="mqttCluster.js" />
     <Compile Include="oregonSensorReceiver.js">
       <SubType>Code</SubType>
     </Compile>

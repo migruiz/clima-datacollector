@@ -1,41 +1,4 @@
-//var mqtt = require('mqtt')
-//var client = mqtt.connect('mqtt://test.mosquitto.org')
 
-//client.on('connect', function (connack) {
-//    client.subscribe('test')
-//    console.log('connected');
-//    console.log(connack);
-//})
-
-//client.on('message', function (topic, message) {
-//    console.log(message.toString())
-//})
-//client.on('reconnect', function () {
-//    console.log('reconnect');
-//})
-//client.on('close', function () {
-//    console.log('close');
-//})
-//client.on('offline', function () {
-//    console.log('offline');
-//})
-//client.on('error', function (error) {
-//    console.log('error');
-//    console.log(error);
-//})
-//client.on('end', function () {
-//    console.log('end');
-//})
-//client.on('packetsend', function (packetsend) {
-//    console.log('packetsend');
-//    console.log(packetsend);
-//})
-//client.on('packetreceive', function (packetreceive) {
-//    console.log('packetreceive');
-//    console.log(packetreceive);
-//})
-
-//return;
 var fileReadingExtractor = require('./fileReadingExtractor.js');
 //var firebaseSyncReceiver = require('./firebaseSyncReceiver.js');
 var oregonSensorReceiver = require('./oregonSensorReceiver.js');
@@ -64,14 +27,14 @@ var sensors = {
 
 //firebaseSyncReceiver.startMonitoring(process.env.TEMPQUEUEURL);
 
-oregonSensorReceiver.startMonitoring('mqtt://localhost', onOregonContentReceived);
+oregonSensorReceiver.startMonitoring(onOregonContentReceived);
 console.log('listenging now');
 function onOregonContentReceived(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);
     if (!sensorReading)
         return;
     var rpId = content.piId;
-    sensorReading.zoneCode = global.map[sensorReading.sensorId];   
+    sensorReading.zoneCode = global.map[sensorReading.sensorId];
     if (!sensorReading.zoneCode) {
         console.log("cound find: " + sensorReading.zoneCode);
         return;
