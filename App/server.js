@@ -25,7 +25,7 @@ var sensors = {
 
 
 mqttCluster.subscribeData('sensorReading', onOregonContentReceived);
-mqttCluster.subscribeData('firebaseNewReading', firebaseDb.updateFirebase);
+mqttCluster.subscribeData('firebaseNewReading', firebaseDb.updateFirebaseAsync);
 console.log('listenging now');
 function onOregonContentReceived(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);

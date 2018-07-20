@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "mqtt": "^2.18.3",
+    "request-promise": "^4.2.2",
     "sqlite3": "^4.0.2"
   }
 }
