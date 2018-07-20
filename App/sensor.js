@@ -19,6 +19,9 @@ function Sensor(sensorCode) {
     }
     async function reportReadingAfterWaitingForSensorsAsync(sensorReading) {
         await sqliteRepository.insertReadingAsync(sensorReading);
+        var zonesReadings = await sqliteRepository.getCurrentReadingsAsync();
+        console.log(zonesReadings);
+        var j = 2;
         //sendChangeToFirebasSync(process.env.TEMPQUEUEURL, sensorReading);
         //var zonesReadings = await (sqliteRepository.getCurrentReadingsAsync());
         //var request = { timestamp: Math.floor(new Date() / 1000), zoneReading: sensorReading };
