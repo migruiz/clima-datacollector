@@ -17,8 +17,8 @@ function Sensor(sensorCode) {
             setTimeout(() => reportReadingAfterWaitingForSensorsAsync(lastReading), 1000 * 5);
         }
     }
-    function reportReadingAfterWaitingForSensorsAsync(sensorReading) {
-        sqliteRepository.insertReadingAsync(sensorReading);
+    async function reportReadingAfterWaitingForSensorsAsync(sensorReading) {
+        await sqliteRepository.insertReadingAsync(sensorReading);
         //sendChangeToFirebasSync(process.env.TEMPQUEUEURL, sensorReading);
         //var zonesReadings = await (sqliteRepository.getCurrentReadingsAsync());
         //var request = { timestamp: Math.floor(new Date() / 1000), zoneReading: sensorReading };

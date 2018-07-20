@@ -64,9 +64,9 @@ var sensors = {
 
 //firebaseSyncReceiver.startMonitoring(process.env.TEMPQUEUEURL);
 
-oregonSensorReceiver.startMonitoring('mqtt://localhost', onOregonContentReceivedAsync);
+oregonSensorReceiver.startMonitoring('mqtt://localhost', onOregonContentReceived);
 console.log('listenging now');
-function onOregonContentReceivedAsync(content) {
+function onOregonContentReceived(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);
     if (!sensorReading)
         return;
@@ -78,7 +78,7 @@ function onOregonContentReceivedAsync(content) {
     }
     console.log(sensorReading);
     var sensor = sensors[sensorReading.zoneCode];
-    //sensor.processNewReadingAsync(sensorReading, rpId);
+    sensor.processNewReading(sensorReading, rpId);
 }
 
 

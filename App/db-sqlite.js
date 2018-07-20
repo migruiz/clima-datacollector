@@ -1,46 +1,78 @@
-var test = 3;
-
-require('sqlite3').Database.prototype.getAsync = function (sql, params) {
-    var dbinner = this;
-    return new Promise(function (resolve, reject) {
-        dbinner.get(sql, params, function (err, data) {
-            if (err !== null) return reject(err);
-            resolve(data);
+function SQLDB(path, structure) {
+     function getAsync (sql, params) {
+        return new Promise(function (resolve, reject) {
+            db.get(sql, params, function (err, data) {
+                if (err !== null) return reject(err);
+                resolve(data);
+            });
         });
-    });
-};
-require('sqlite3').Database.prototype.allAsync = function (sql, params) {
-    var dbinner = this;
-    return new Promise(function (resolve, reject) {
-        dbinner.all(sql, params, function (err, data) {
-            if (err !== null) return reject(err);
-            resolve(data);
+    };
+    this.getAsync = getAsync;
+    function allAsync (sql, params) {
+        return new Promise(function (resolve, reject) {
+            db.all(sql, params, function (err, data) {
+                if (err !== null) return reject(err);
+                resolve(data);
+            });
         });
-    });
-};
-require('sqlite3').Database.prototype.runAsync = function (sql, params) {
-    var dbinner = this;
-    return new Promise(function (resolve, reject) {
-        dbinner.run(sql, params, function (err) {
-            if (err !== null) return reject(err);
-            resolve();
+    };
+    this.allAsync = allAsync;
+    function runAsync (sql, params) {
+        return new Promise(function (resolve, reject) {
+            db.run(sql, params, function (err) {
+                if (err !== null) return reject(err);
+                resolve();
+            });
         });
-    });
-};
-
-
-var fx = function () {
-    var instance;
-
+    };
+    this.runAsync = runAsync;
     function createInstance() {
 
         var sqlite3 = require('sqlite3').verbose();
-        var db = new sqlite3.Database('C:\\repos\\clima-datacollector\\App\\test.sqlite');
+        var db = new sqlite3.Database(path);
         return db;
     }
-    db = createInstance();
-    var versionHistory = [];
-    versionHistory.push(`CREATE TABLE ZonesTemperature (
+
+    var db = createInstance();
+    createStructureAsync();
+
+    async function createStructureAsync() {
+        var data = await getAsync("PRAGMA USER_VERSION");
+        var currentVersionNo = data.user_version;
+        var newVersionNo = versionHistory.length;
+        if (newVersionNo > currentVersionNo) {
+            await runAsync("BEGIN IMMEDIATE TRANSACTION");
+            try {
+                await applyDatabaseConfigurationChangesAsync(currentVersionNo, versionHistory);
+                await runAsync("PRAGMA USER_VERSION=" + newVersionNo.toString());
+                await runAsync("COMMIT TRANSACTION");
+            }
+            catch (err) {
+                await runAsync("ROLLBACK");
+                throw err;
+            }
+
+        }
+
+
+    }
+    async function applyDatabaseConfigurationChangesAsync(currentVersion, versions) {
+        for (var i = currentVersion; i < versions.length; i++) {
+            var expr = versions[i];
+            await runAsync(expr);
+        }
+    }
+
+
+
+}
+
+
+
+
+
+var versionHistory = [];
+versionHistory.push(`CREATE TABLE ZonesTemperature (
         id integer primary key
         ,zoneCode text not null collate nocase
         ,sensorId text not null collate nocase
@@ -49,45 +81,11 @@ var fx = function () {
         ,humidity real
         ,timestamp int
         );`);
-    versionHistory.push('CREATE UNIQUE INDEX IX_ZonesTemperature ON ZonesTemperature (zoneCode ASC);');
-
-
-    async function  applyDatabaseConfigurationChangesAsync(db, currentVersion, versions) {
-        for (var i = currentVersion; i < versions.length; i++) {
-            var expr = versions[i];
-            await db.runAsync(expr);
-        }
-    }
-
-    var suspendable = async function () {
-        var data = await db.getAsync("PRAGMA USER_VERSION");
-            var currentVersionNo = data.user_version;
-            var newVersionNo = versionHistory.length;
-            if (newVersionNo > currentVersionNo) {
-                await db.runAsync("BEGIN IMMEDIATE TRANSACTION");
-                try {
-                    await applyDatabaseConfigurationChangesAsync(db, currentVersionNo, versionHistory);
-                    await db.runAsync("PRAGMA USER_VERSION=" + newVersionNo.toString());
-                    await db.runAsync("COMMIT TRANSACTION");
-                }
-                catch (err) {
-                    await db.runAsync("ROLLBACK");
-                    throw err;
-                }
-
-            }
-        
-        
-    }
-    suspendable();
+versionHistory.push('CREATE UNIQUE INDEX IX_ZonesTemperature ON ZonesTemperature (zoneCode ASC);');
 
 
 
-
-
-
-};
-var singleton = fx();
+var singleton = new SQLDB('c:\\temp.sqlite', versionHistory);
 
 
 exports.database = function () {
