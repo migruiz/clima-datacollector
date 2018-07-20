@@ -31,11 +31,7 @@
   <ItemGroup>
     <Compile Include="db-firebase.js" />
     <Compile Include="db-sqlite.js" />
-    <Compile Include="firebaseSyncReceiver.js" />
     <Compile Include="mqttCluster.js" />
-    <Compile Include="oregonSensorReceiver.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="rabbitQueueListenerConnector.js" />
     <Compile Include="ReadingValidator.js">
       <SubType>Code</SubType>

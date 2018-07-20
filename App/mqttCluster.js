@@ -28,13 +28,18 @@ function MQTTClient(mqttServer) {
         console.log('end');
     })
 
-    this.subscribe = function (topic, onMessage) {
+    this.subscribeData = function (topic, onData) {
         client.subscribe(topic);
         client.on("message", function (mtopic, message) {
             if (topic === mtopic) {
-                onMessage(message);
+                var data = JSON.parse(message);
+                onData(data);
             }
         });
+    }
+    this.publishData = function (topic, data) {
+        var message = JSON.stringify(data);
+        client.publish(topic, message);
     }
 }
 

@@ -1,4 +1,4 @@
-
+var mqttCluster = require('./mqttCluster.js').cluster();
 var sqliteRepository = require('./sqliteSensorReadingRepository.js');
 
 function Sensor(sensorCode) {
@@ -19,13 +19,11 @@ function Sensor(sensorCode) {
     }
     async function reportReadingAfterWaitingForSensorsAsync(sensorReading) {
         await sqliteRepository.insertReadingAsync(sensorReading);
+        mqttCluster.publishData("firebaseNewReading", sensorReading);
         var zonesReadings = await sqliteRepository.getCurrentReadingsAsync();
-        console.log(zonesReadings);
-        var j = 2;
-        //sendChangeToFirebasSync(process.env.TEMPQUEUEURL, sensorReading);
-        //var zonesReadings = await (sqliteRepository.getCurrentReadingsAsync());
-        //var request = { timestamp: Math.floor(new Date() / 1000), zoneReading: sensorReading };
-        //reportCurrentZoneReading(process.env.TEMPQUEUEURL, request);
+        var request = { timestamp: Math.floor(new Date() / 1000), zoneReading: sensorReading };
+        mqttCluster.publishData("zonesChange", request);
+        console.log("processed");
     }
 
 

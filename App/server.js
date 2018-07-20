@@ -1,7 +1,6 @@
-
+var mqttCluster = require('./mqttCluster.js').cluster();
 var fileReadingExtractor = require('./fileReadingExtractor.js');
-//var firebaseSyncReceiver = require('./firebaseSyncReceiver.js');
-var oregonSensorReceiver = require('./oregonSensorReceiver.js');
+var firebaseDb = require('./db-firebase.js');
 var sensorsCreator = require('./sensor.js');
 
 global.map = {
@@ -25,9 +24,8 @@ var sensors = {
 };
 
 
-//firebaseSyncReceiver.startMonitoring(process.env.TEMPQUEUEURL);
-
-oregonSensorReceiver.startMonitoring(onOregonContentReceived);
+mqttCluster.subscribeData('sensorReading', onOregonContentReceived);
+mqttCluster.subscribeData('firebaseNewReading', firebaseDb.updateFirebase);
 console.log('listenging now');
 function onOregonContentReceived(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);
