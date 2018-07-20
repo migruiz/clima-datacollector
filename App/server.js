@@ -1,7 +1,7 @@
 var fileReadingExtractor = require('./fileReadingExtractor.js');
 //var firebaseSyncReceiver = require('./firebaseSyncReceiver.js');
 var oregonSensorReceiver = require('./oregonSensorReceiver.js');
-//var sensorsCreator = require('./sensor.js');
+var sensorsCreator = require('./sensor.js');
 
 global.map = {
     BC: "masterroom",
@@ -13,15 +13,15 @@ global.map = {
     E9: "livingroom"
 };
 
-//var sensors = {
-//    masterroom: sensorsCreator.newInstance("masterroom"),
-//    entrance: sensorsCreator.newInstance("entrance"),
-//    secondbedroom: sensorsCreator.newInstance("secondbedroom"),
-//    computerroom: sensorsCreator.newInstance("computerroom"),
-//    outside: sensorsCreator.newInstance("outside"),
-//    masterbathroom: sensorsCreator.newInstance("masterbathroom"),
-//    livingroom: sensorsCreator.newInstance("livingroom")
-//};
+var sensors = {
+    masterroom: sensorsCreator.newInstance("masterroom"),
+    entrance: sensorsCreator.newInstance("entrance"),
+    secondbedroom: sensorsCreator.newInstance("secondbedroom"),
+    computerroom: sensorsCreator.newInstance("computerroom"),
+    outside: sensorsCreator.newInstance("outside"),
+    masterbathroom: sensorsCreator.newInstance("masterbathroom"),
+    livingroom: sensorsCreator.newInstance("livingroom")
+};
 
 
 //firebaseSyncReceiver.startMonitoring(process.env.TEMPQUEUEURL);

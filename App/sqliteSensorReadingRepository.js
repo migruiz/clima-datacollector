@@ -1,4 +1,3 @@
-var await = require('asyncawait/await');
 var sqliteDb = require('./db-sqlite.js');
 exports.insertReadingAsync = function (reading) {
     sqliteDb.database().operateDatabaseAsync(function (db) {
