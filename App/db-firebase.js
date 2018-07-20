@@ -5,7 +5,7 @@ var FbCentralProjectURL = 'https://centralstation-cdc47.firebaseio.com/'
 exports.updateFirebaseAsync = async function (reading) {
     console.log("updating firebase");
 
-    var zoneInfo = await getZoneInfo(reading.sensorId);
+    var zoneInfo = await getZoneInfoAsync(reading.sensorId);
     if (!zoneInfo)
         return;
     await insertReadingAsync(zoneInfo.FbProjectURL, reading);
@@ -24,7 +24,7 @@ exports.updateFirebaseAsync = async function (reading) {
         clearInterval(notTransmittingHandlers[zoneInfo.ZoneCode]);
     }
     var handler = setInterval(function () {
-        notifySensorDidNotTransmit(zoneInfo.ZoneCode);
+        notifySensorDidNotTransmitAsync(zoneInfo.ZoneCode);
     }, 1000 * 60);
     notTransmittingHandlers[zoneInfo.ZoneCode] = handler;
     return;
