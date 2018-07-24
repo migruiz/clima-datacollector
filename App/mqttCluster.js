@@ -43,7 +43,7 @@ function MQTTClient(mqttServer) {
     }
 }
 
-var mqttClient = new MQTTClient("mqtt://192.168.0.137");
+var mqttClient = new MQTTClient("mqtt://localhost");
 
 exports.cluster = function () {
 

@@ -85,7 +85,7 @@ versionHistory.push('CREATE UNIQUE INDEX IX_ZonesTemperature ON ZonesTemperature
 
 
 
-var singleton = new SQLDB('C:\\Users\\piscos\\Documents\\temp.sqlite', versionHistory);
+var singleton = new SQLDB('c:\\temp.sqlite', versionHistory);
 
 
 exports.database = function () {
