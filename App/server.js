@@ -12,6 +12,11 @@ global.map = {
     E0: "masterbathroom",
     E9: "livingroom"
 };
+global.dbPath = 'c:\\temp.sqlite';
+global.mtqqLocalPath = "mqtt://localhost";
+global.sensorReadingTopic = 'sensorReading';
+global.fireBaseReadingTopic = 'firebaseNewReading';
+global.zonesReadingsTopic = 'zonesChange';
 
 var sensors = {
     masterroom: sensorsCreator.newInstance("masterroom"),
@@ -24,8 +29,8 @@ var sensors = {
 };
 
 
-mqttCluster.subscribeData('sensorReading', onOregonContentReceived);
-mqttCluster.subscribeData('firebaseNewReading', firebaseDb.updateFirebaseAsync);
+mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceived);
+mqttCluster.subscribeData(global.fireBaseReadingTopic, firebaseDb.updateFirebaseAsync);
 console.log('listenging now');
 function onOregonContentReceived(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);
