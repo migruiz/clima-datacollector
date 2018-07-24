@@ -39,7 +39,7 @@ function SQLDB(path, structure) {
     async function createStructureAsync() {
         var data = await getAsync("PRAGMA USER_VERSION");
         var currentVersionNo = data.user_version;
-        var newVersionNo = versionHistory.length;
+        var newVersionNo = structure.length;
         if (newVersionNo > currentVersionNo) {
             await runAsync("BEGIN IMMEDIATE TRANSACTION");
             try {

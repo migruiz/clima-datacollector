@@ -1,4 +1,4 @@
-var mqttCluster = require('./mqttCluster.js').cluster();
+var mqtt = require('./mqttCluster.js');
 var sqliteRepository = require('./sqliteSensorReadingRepository.js');
 
 function Sensor() {
@@ -19,10 +19,10 @@ function Sensor() {
     }
     async function reportReadingAfterWaitingForSensorsAsync(sensorReading) {
         await sqliteRepository.insertReadingAsync(sensorReading);
-        mqttCluster.publishData(global.fireBaseReadingTopic, sensorReading);
+        mqtt.cluster().publishData(global.fireBaseReadingTopic, sensorReading);
         var zonesReadings = await sqliteRepository.getCurrentReadingsAsync();
         var request = { timestamp: Math.floor(new Date() / 1000), zoneReading: sensorReading };
-        mqttCluster.publishData(global.zonesReadingsTopic, request);
+        mqtt.cluster().publishData(global.zonesReadingsTopic, request);
         console.log("processed");
     }
 

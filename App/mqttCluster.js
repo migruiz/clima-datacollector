@@ -43,9 +43,16 @@ function MQTTClient(mqttServer) {
     }
 }
 
-var mqttClient = new MQTTClient(global.mtqqLocalPath);
+
+
+var singleton;
+
 
 exports.cluster = function () {
 
-    return mqttClient;
+    if (!singleton) {
+        singleton = new MQTTClient(global.mtqqLocalPath);
+    }
+
+    return singleton;
 }

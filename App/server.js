@@ -1,4 +1,4 @@
-var mqttCluster = require('./mqttCluster.js').cluster();
+var mqtt = require('./mqttCluster.js');
 var fileReadingExtractor = require('./fileReadingExtractor.js');
 //var firebaseDb = require('./db-firebase.js');
 var sensorsCreator = require('./sensor.js');
@@ -13,6 +13,7 @@ global.zones= {
     livingroom: { sensorId: 'E9', boilerZone: 'downstairs', FBProject: 'https://livingroom-da3de.firebaseio.com/' },
 }
 global.dbPath = 'c:\\temp.sqlite';
+//global.mtqqLocalPath = process.env.MQTTLOCAL;
 global.mtqqLocalPath = "mqtt://localhost";
 global.sensorReadingTopic = 'sensorReading';
 global.fireBaseReadingTopic = 'firebaseNewReading';
@@ -23,10 +24,10 @@ var sensorsMap = new Map();
 for (var key in global.zones) {
     sensorsMap.set(global.zones[key].sensorId, { zoneCode: key, sensor: sensorsCreator.newInstance() });
 }
-console.log(sensorsMap.toString());
+console.log(JSON.stringify(sensorsMap));
 
 
-mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceived);
+mqtt.cluster().subscribeData(global.sensorReadingTopic, onOregonContentReceived);
 //mqttCluster.subscribeData(global.fireBaseReadingTopic, firebaseDb.updateFirebaseAsync);
 console.log('listenging now');
 function onOregonContentReceived(content) {
@@ -34,7 +35,7 @@ function onOregonContentReceived(content) {
     if (!sensorReading)
         return;
     var rpId = content.piId;
-    sensorData = sensorsMap[sensorReading.sensorId];
+    sensorData = sensorsMap.get(sensorReading.sensorId);
     if (!sensorData) {
         console.log("cound find: " + sensorReading.sensorId);
         return;
