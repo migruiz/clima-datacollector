@@ -71,25 +71,7 @@ function SQLDB(path, structure) {
 
 
 
-var versionHistory = [];
-versionHistory.push(`CREATE TABLE ZonesTemperature (
-        id integer primary key
-        ,zoneCode text not null collate nocase
-        ,sensorId text not null collate nocase
-        ,channel int
-        ,temperature real
-        ,humidity real
-        ,timestamp int
-        );`);
-versionHistory.push('CREATE UNIQUE INDEX IX_ZonesTemperature ON ZonesTemperature (zoneCode ASC);');
 
 
-
-var singleton = new SQLDB(global.dbPath, versionHistory);
-
-
-exports.database = function () {
-
-    return singleton;
-}
+exports.SQLDB = SQLDB;
 

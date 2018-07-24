@@ -1,7 +1,7 @@
 var mqttCluster = require('./mqttCluster.js').cluster();
 var sqliteRepository = require('./sqliteSensorReadingRepository.js');
 
-function Sensor(sensorCode) {
+function Sensor() {
 
     var lastReading;
     var waitingForOtherSensors;
@@ -30,7 +30,7 @@ function Sensor(sensorCode) {
 
 }
 
-exports.newInstance = function (zoneCode) {
-    var instance = new Sensor(zoneCode);
+exports.newInstance = function () {
+    var instance = new Sensor();
     return instance;
 }
