@@ -3,8 +3,6 @@ var historyWriter = require('./historyWriter.js');
 var notTransmittingHandlers = [];
 var FbCentralProjectURL = 'https://centralstation-cdc47.firebaseio.com/'
 exports.updateFirebaseAsync = async function (reading) {
-    console.log("updating firebase");
-
     var zoneInfo = await getZoneInfoAsync(reading.sensorId);
     if (!zoneInfo)
         return;
