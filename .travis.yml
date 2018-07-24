@@ -6,12 +6,8 @@ services:
 
 env:
   global:
-    - PI_APP=climav2-datacollector-rpi3
-script:
-- docker pull migruiz/$PI_APP || true
-- docker build --cache-from migruiz/$PI_APP  -t migruiz/$PI_APP . || travis_terminate 1
-- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1
-- docker push migruiz/$PI_APP || travis_terminate 1
+    - PI_APP=clima-datacollector-rpi3
+script: bash travis.sh || travis_terminate 1;
 
 notifications:
    email:
