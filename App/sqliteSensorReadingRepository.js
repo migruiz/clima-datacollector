@@ -1,6 +1,6 @@
 var zonesdb = require('./zonesDatabase');
 exports.insertReadingAsync = async function (reading) {
-    await zonesdb.instance().runAsync("REPLACE INTO ZonesTemperature(zoneCode,sensorId,channel,temperature,humidity,timestamp) values ($zoneCode,$sensorId,$channel,$temperature,$humidity,$timestamp)",
+    await zonesdb.instance().operate(db=>db.runAsync("REPLACE INTO ZonesTemperature(zoneCode,sensorId,channel,temperature,humidity,timestamp) values ($zoneCode,$sensorId,$channel,$temperature,$humidity,$timestamp)",
         {
             $zoneCode: reading.zoneCode,
             $sensorId: reading.sensorId,
@@ -8,10 +8,10 @@ exports.insertReadingAsync = async function (reading) {
             $temperature: reading.temperature,
             $humidity: reading.humidity,
             $timestamp: reading.timeStamp
-        });
+        }));
 }
 exports.getCurrentReadingsAsync =async  function () {
-    var valveData = await zonesdb.instance().allAsync("select zoneCode,temperature,timestamp from ZonesTemperature");
+    var valveData = await zonesdb.instance().operate(db=>db.allAsync("select zoneCode,temperature,timestamp from ZonesTemperature"));
     return valveData;
 
 }

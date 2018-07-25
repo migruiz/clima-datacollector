@@ -1,5 +1,7 @@
+var PromiseQueue = require('a-promise-queue');
 function SQLDB(path, structure) {
-     function getAsync (sql, params) {
+
+    function getAsync(sql, params) {
         return new Promise(function (resolve, reject) {
             db.get(sql, params, function (err, data) {
                 if (err !== null) return reject(err);
@@ -8,7 +10,7 @@ function SQLDB(path, structure) {
         });
     };
     this.getAsync = getAsync;
-    function allAsync (sql, params) {
+    function allAsync(sql, params) {
         return new Promise(function (resolve, reject) {
             db.all(sql, params, function (err, data) {
                 if (err !== null) return reject(err);
@@ -17,7 +19,7 @@ function SQLDB(path, structure) {
         });
     };
     this.allAsync = allAsync;
-    function runAsync (sql, params) {
+    function runAsync(sql, params) {
         return new Promise(function (resolve, reject) {
             db.run(sql, params, function (err) {
                 if (err !== null) return reject(err);
@@ -33,17 +35,18 @@ function SQLDB(path, structure) {
         return db;
     }
 
-    var db = createInstance();
-    createStructureAsync();
+    var db;
+    this.initAsync=initAsync;
 
-    async function createStructureAsync() {
+    async function initAsync() {
+        db=createInstance();
         var data = await getAsync("PRAGMA USER_VERSION");
-        var currentVersionNo = data.user_version;
+        var currentVersionNo = data.USER_VERSION;
         var newVersionNo = structure.length;
         if (newVersionNo > currentVersionNo) {
             await runAsync("BEGIN IMMEDIATE TRANSACTION");
             try {
-                await applyDatabaseConfigurationChangesAsync(currentVersionNo, versionHistory);
+                await applyDatabaseConfigurationChangesAsync(currentVersionNo, structure);
                 await runAsync("PRAGMA USER_VERSION=" + newVersionNo.toString());
                 await runAsync("COMMIT TRANSACTION");
             }
@@ -67,11 +70,24 @@ function SQLDB(path, structure) {
 
 }
 
+function SQLDBWrapper(path, structure){
+    var sqlDB
+    var queue = new PromiseQueue();  
+    this.operate=async function(operation){
+        return await queue.add(async function() {
+            if (!sqlDB){
+                sqlDB=new SQLDB(path,structure);
+                await sqlDB.initAsync();
+            }
+            return await operation(sqlDB);
+        });
+    }
+}
 
 
 
 
 
 
-exports.SQLDB = SQLDB;
+exports.SQLDB = SQLDBWrapper;
 
