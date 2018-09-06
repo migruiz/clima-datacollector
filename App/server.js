@@ -39,6 +39,7 @@ function onOregonContentReceivedAsync(content) {
     sensorReading.zoneCode = global.map[sensorReading.sensorId];   
     if (!sensorReading.zoneCode) {
         console.log("cound find: " + sensorReading.zoneCode);
+        console.log(JSON.stringify(content));
         return;
     }
     var sensor = sensors[sensorReading.zoneCode];
