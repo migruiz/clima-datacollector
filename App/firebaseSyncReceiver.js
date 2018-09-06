@@ -16,7 +16,6 @@ exports.startMonitoring = function (intranetAMQPURI) {
                 ch.ack(msg);
             }
             catch (err) {
-                console.log(err);
                 setTimeout(function () {
                     ch.reject(msg, true);
                 }, 1000);
