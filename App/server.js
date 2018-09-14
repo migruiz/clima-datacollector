@@ -12,9 +12,11 @@ global.zones= {
     masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' },
     livingroom: { sensorId: 'E9', boilerZone: 'downstairs'},
 }
-global.dbPath = 'c:\\temp.sqlite';
-//global.mtqqLocalPath = process.env.MQTTLOCAL;
-global.mtqqLocalPath = "mqtt://localhost";
+//global.dbPath = 'c:\\temp.sqlite';
+global.dbPath = '/App/db.sqlite'
+
+global.mtqqLocalPath = process.env.MQTTLOCAL;
+//global.mtqqLocalPath = "mqtt://localhost";
 global.sensorReadingTopic = 'sensorReading';
 global.fireBaseReadingTopic = 'firebaseNewReading';
 global.zonesReadingsTopic = 'zonesChange';
