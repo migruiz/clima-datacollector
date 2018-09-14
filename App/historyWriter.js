@@ -1,6 +1,6 @@
 exports.writeHistoryAsync = async function (input) {
     var rp = require('request-promise');
-    var FbCentralProjectURL = 'https://centralstation-cdc47.firebaseio.com/'
+    var FbCentralProjectURL = 'https://centralstationv2.firebaseio.com/'
     var reading = input.reading;
     var resolution = input.resolution;
     var zoneCode = input.zoneCode;

@@ -18,12 +18,12 @@ function Sensor() {
         }
     }
     async function reportReadingAfterWaitingForSensorsAsync(sensorReading) {
+        waitingForOtherSensors=false;
         await sqliteRepository.insertReadingAsync(sensorReading);
         mqtt.cluster().publishData(global.fireBaseReadingTopic, sensorReading);
         var zonesReadings = await sqliteRepository.getCurrentReadingsAsync();
         var request = { timestamp: Math.floor(new Date() / 1000), zoneReading: sensorReading };
         mqtt.cluster().publishData(global.zonesReadingsTopic, request);
-        console.log("processed");
     }
 
 

@@ -41,7 +41,6 @@ function onOregonContentReceived(content) {
         return;
     }
     sensorReading.zoneCode = sensorData.zoneCode;
-    console.log(sensorReading);
     sensorData.sensor.processNewReading(sensorReading, rpId);
 }
 
