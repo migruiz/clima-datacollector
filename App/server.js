@@ -1,6 +1,6 @@
 var mqtt = require('./mqttCluster.js');
 var fileReadingExtractor = require('./fileReadingExtractor.js');
-//var firebaseDb = require('./db-firebase.js');
+var firebaseDb = require('./db-firebase.js');
 var sensorsCreator = require('./sensor.js');
 
 global.zones= {
@@ -28,7 +28,7 @@ console.log(JSON.stringify(sensorsMap));
 
 
 mqtt.cluster().subscribeData(global.sensorReadingTopic, onOregonContentReceived);
-//mqttCluster.subscribeData(global.fireBaseReadingTopic, firebaseDb.updateFirebaseAsync);
+mqtt.cluster().subscribeData(global.fireBaseReadingTopic, firebaseDb.updateFirebaseAsync);
 console.log('listenging now');
 function onOregonContentReceived(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);
@@ -42,7 +42,6 @@ function onOregonContentReceived(content) {
     }
     sensorReading.zoneCode = sensorData.zoneCode;
     console.log(sensorReading);
-    return;
     sensorData.sensor.processNewReading(sensorReading, rpId);
 }
 

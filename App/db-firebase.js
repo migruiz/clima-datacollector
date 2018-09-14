@@ -1,39 +1,29 @@
 var rp = require('request-promise');
 var historyWriter = require('./historyWriter.js');
 var notTransmittingHandlers = [];
-var FbCentralProjectURL = 'https://centralstation-cdc47.firebaseio.com/'
+var FbCentralProjectURL = 'https://centralstationv2.firebaseio.com/'
 exports.updateFirebaseAsync = async function (reading) {
-    var zoneInfo = await getZoneInfoAsync(reading.sensorId);
-    if (!zoneInfo)
-        return;
-    await insertReadingAsync(zoneInfo.FbProjectURL, reading);
-    var currentCoverage = await getCurrentZoneCoverageAsync(zoneInfo.ZoneCode);
+    var currentCoverage = await getCurrentZoneCoverageAsync(reading.zoneCode);
     var newCoverage = '00001';
     if (currentCoverage) {
         newCoverage = currentCoverage + '1';
         newCoverage = newCoverage.substring(newCoverage.length - 5, newCoverage.length);
     }
-    reading.zone = zoneInfo.ZoneCode;
+    reading.zone = reading.zoneCode;
     reading.coverage = newCoverage;
     reading.coverageInt = (newCoverage.match(/1/g) || []).length;
-    await updateCurrentTemperatureAsync(zoneInfo.ZoneCode, reading);
-    await writeIntervalsHistoryAsync(zoneInfo.ZoneCode, reading);
-    if (zoneInfo.ZoneCode in notTransmittingHandlers) {
-        clearInterval(notTransmittingHandlers[zoneInfo.ZoneCode]);
+    await updateCurrentTemperatureAsync(reading.zoneCode, reading);
+    await writeIntervalsHistoryAsync(reading.zoneCode, reading);
+    if (reading.zoneCode in notTransmittingHandlers) {
+        clearInterval(notTransmittingHandlers[reading.zoneCode]);
     }
     var handler = setInterval(function () {
-        notifySensorDidNotTransmitAsync(zoneInfo.ZoneCode);
+        notifySensorDidNotTransmitAsync(reading.zoneCode);
     }, 1000 * 60);
-    notTransmittingHandlers[zoneInfo.ZoneCode] = handler;
+    notTransmittingHandlers[reading.zoneCode] = handler;
     return;
 
-    function getZoneInfoAsync(sensorId) {
-        return rp({
-            url: FbCentralProjectURL + 'sensorsmap/' + sensorId + '.json',
-            method: 'GET',
-            json: true
-        });
-    }
+
     function getCurrentZoneCoverageAsync(zoneCode) {
         return rp({
             url: FbCentralProjectURL + 'zones/' + zoneCode + '/coverage.json',

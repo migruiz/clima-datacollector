@@ -41,7 +41,8 @@ function SQLDB(path, structure) {
     async function initAsync() {
         db=createInstance();
         var data = await getAsync("PRAGMA USER_VERSION");
-        var currentVersionNo = data.USER_VERSION;
+        //var currentVersionNo = data.USER_VERSION;
+        var currentVersionNo = data.user_version;
         var newVersionNo = structure.length;
         if (newVersionNo > currentVersionNo) {
             await runAsync("BEGIN IMMEDIATE TRANSACTION");
