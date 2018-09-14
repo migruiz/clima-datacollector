@@ -4,13 +4,13 @@ var fileReadingExtractor = require('./fileReadingExtractor.js');
 var sensorsCreator = require('./sensor.js');
 
 global.zones= {
-    masterroom: { sensorId: 'BC', boilerZone: 'upstairs', FBProject: 'https://master-bedr.firebaseio.com/' },
-    playroom: { sensorId: 'C1', boilerZone: 'upstairs', FBProject: '"https://entrance-a09f3.firebaseio.com/"' },
-    secondbedroom: { sensorId: 'C6', boilerZone: 'upstairs', FBProject: 'https://secondbedroom-99372.firebaseio.com/' },
-    computerroom: { sensorId: 'CC', boilerZone: 'upstairs', FBProject: 'https://computer-room.firebaseio.com/' },
-    outside: { sensorId: 'CD', FBProject: 'https://outside-9a247.firebaseio.com/' },
-    masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs', FBProject: 'https://masterbathroom-99bfb.firebaseio.com/' },
-    livingroom: { sensorId: 'E9', boilerZone: 'downstairs', FBProject: 'https://livingroom-da3de.firebaseio.com/' },
+    masterroom: { sensorId: 'BC', boilerZone: 'upstairs' },
+    playroom: { sensorId: 'C1', boilerZone: 'upstairs' },
+    secondbedroom: { sensorId: 'C6', boilerZone: 'upstairs' },
+    computerroom: { sensorId: 'CC', boilerZone: 'upstairs'},
+    outside: { sensorId: 'CD' },
+    masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' },
+    livingroom: { sensorId: 'E9', boilerZone: 'downstairs'},
 }
 global.dbPath = 'c:\\temp.sqlite';
 //global.mtqqLocalPath = process.env.MQTTLOCAL;
@@ -42,6 +42,7 @@ function onOregonContentReceived(content) {
     }
     sensorReading.zoneCode = sensorData.zoneCode;
     console.log(sensorReading);
+    return;
     sensorData.sensor.processNewReading(sensorReading, rpId);
 }
 
