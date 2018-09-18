@@ -24,7 +24,7 @@ global.zonesReadingsTopic = 'zonesChange';
 
 var sensorsMap = new Map();
 for (var key in global.zones) {
-    sensorsMap.set(global.zones[key].sensorId, { zoneCode: key, sensor: sensorsCreator.newInstance() });
+    sensorsMap.set(global.zones[key].sensorId, sensorsCreator.newInstance(key));
 }
 console.log(JSON.stringify(sensorsMap));
 
@@ -42,8 +42,7 @@ async function onOregonContentReceivedAsync(content) {
         console.log("cound find: " + sensorReading.sensorId);
         return;
     }
-    sensorReading.zoneCode = sensorData.zoneCode;
-    await sensorData.sensor.processNewReadingAsync(sensorReading, rpId);
+    await sensorData.processNewReadingAsync(sensorReading, rpId);
 }
 
 

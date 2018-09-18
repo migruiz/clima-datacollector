@@ -1,18 +1,10 @@
 var rp = require('request-promise');
 var historyWriter = require('./historyWriter.js');
-var notTransmittingHandlers = [];
 var FbCentralProjectURL = 'https://centralstationv2.firebaseio.com/'
 exports.updateFirebaseAsync = async function (reading) {
     reading.zone = reading.zoneCode;
     await updateCurrentTemperatureAsync(reading.zoneCode, reading);
     await writeIntervalsHistoryAsync(reading.zoneCode, reading);
-    if (reading.zoneCode in notTransmittingHandlers) {
-        clearInterval(notTransmittingHandlers[reading.zoneCode]);
-    }
-    var handler = setInterval(function () {
-        notifySensorDidNotTransmitAsync(reading.zoneCode);
-    }, 1000 * 60);
-    notTransmittingHandlers[reading.zoneCode] = handler;
     return;
 
 
@@ -71,13 +63,7 @@ exports.updateFirebaseAsync = async function (reading) {
         });
     }
 
-    async function notifySensorDidNotTransmitAsync(zoneCode) {
-        var currentCoverage = await getCurrentZoneCoverageAsync(zoneCode);
-        var newCoverage = currentCoverage + '0';
-        newCoverage = newCoverage.substring(newCoverage.length - 5, newCoverage.length);
-        await updateNewCoverageAsync(zoneCode, newCoverage);
 
-    }
 
 
 

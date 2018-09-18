@@ -1,39 +1,59 @@
 var mqtt = require('./mqttCluster.js');
 var sqliteRepository = require('./sqliteSensorReadingRepository.js');
 var PromiseQueue = require('a-promise-queue');
-function Sensor() {
+function Sensor(zoneCode) {
 
+    
+    var lastReading={
+        coverage:"000000",
+        zoneCode:zoneCode
+    }
+    startNotReceivedTransmissionCountDown();
 
-
-
+    var notTransmittingHandler;
     var messageReadingQueue = new PromiseQueue();
-    var lastReading;
     var waitingForOtherSensors;
-    var coverageText = "00000";
     this.processNewReadingAsync = async function (sensorReading, piId) {
+        clearInterval(notTransmittingHandler);
+        startNotReceivedTransmissionCountDown();
+        console.log((new Date().getTime())+' '+sensorReading.sensorId+' '+piId.toString());
         return await messageReadingQueue.add(async function () {
             if (waitingForOtherSensors) {
                 lastReading.rpi = lastReading.rpi | piId;
             }
             else {
-                sensorReading.rpi = piId;
-                lastReading = sensorReading;
+                lastReading.channel=sensorReading.channel;
+                lastReading.humidity=sensorReading.humidity;
+                lastReading.sensorId=sensorReading.sensorId;
+                lastReading.temperature=sensorReading.temperature;
+                lastReading.timeStamp=sensorReading.timeStamp;
+                lastReading.rpi = piId;
                 waitingForOtherSensors = true;
-                setTimeout(() => onAllSensorsReadAsync(), 1000 * 5);
+                setTimeout(() => 
+                {                    
+                    waitingForOtherSensors = false;
+                    onAllSensorsReadAsync();
+                }, 1000 * 2);
             }
         });
     }
+
+    function startNotReceivedTransmissionCountDown(){
+        notTransmittingHandler = setInterval(function () {
+            updateSensorCoverage('0');
+            mqtt.cluster().publishData(global.fireBaseReadingTopic, lastReading);
+        }, 1000 * 60);
+    }
+
+    function updateSensorCoverage(symbol){
+        var newcoverageText = lastReading.coverage + symbol;
+        newcoverageText = newcoverageText.substring(newcoverageText.length - 6, newcoverageText.length);
+        lastReading.coverage = newcoverageText;
+    }
     async function onAllSensorsReadAsync() {
-
-        var newcoverageText = coverageText + lastReading.rpi.toString();
-        newcoverageText = newcoverageText.substring(newcoverageText.length - 5, newcoverageText.length);
-        coverageText = newcoverageText;
-        lastReading.coverage = coverageText;
-
-        waitingForOtherSensors = false;
+        updateSensorCoverage(lastReading.rpi.toString());
         await sqliteRepository.insertReadingAsync(lastReading);
         mqtt.cluster().publishData(global.fireBaseReadingTopic, lastReading);
-        var zonesReadings = await sqliteRepository.getCurrentReadingsAsync();
         var request = { timestamp: Math.floor(new Date() / 1000), zoneReading: lastReading };
         mqtt.cluster().publishData(global.zonesReadingsTopic, request);
     }
@@ -42,7 +62,7 @@ function Sensor() {
 
 }
 
-exports.newInstance = function () {
-    var instance = new Sensor();
+exports.newInstance = function (zoneCode) {
+    var instance = new Sensor(zoneCode);
     return instance;
 }
