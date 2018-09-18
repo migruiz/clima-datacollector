@@ -16,7 +16,7 @@ function Sensor(zoneCode) {
     this.processNewReadingAsync = async function (sensorReading, piId) {
         clearInterval(notTransmittingHandler);
         startNotReceivedTransmissionCountDown();
-        console.log((new Date().getTime())+' '+sensorReading.sensorId+' '+piId.toString());
+        //console.log((new Date().getTime())+' '+sensorReading.sensorId+' '+piId.toString());
         return await messageReadingQueue.add(async function () {
             if (waitingForOtherSensors) {
                 lastReading.rpi = lastReading.rpi | piId;

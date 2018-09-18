@@ -12,8 +12,8 @@ global.zones= {
     masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' },
     livingroom: { sensorId: 'E9', boilerZone: 'downstairs'},
 }
-global.dbPath = 'c:\\temp.sqlite';
-//global.dbPath = '/App/db.sqlite'
+//global.dbPath = 'c:\\temp.sqlite';
+global.dbPath = '/App/db.sqlite'
 
 global.mtqqLocalPath = process.env.MQTTLOCAL;
 //global.mtqqLocalPath = "mqtt://localhost";
@@ -26,7 +26,6 @@ var sensorsMap = new Map();
 for (var key in global.zones) {
     sensorsMap.set(global.zones[key].sensorId, sensorsCreator.newInstance(key));
 }
-console.log(JSON.stringify(sensorsMap));
 
 
 mqtt.cluster().subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
@@ -39,7 +38,6 @@ async function onOregonContentReceivedAsync(content) {
     var rpId = content.piId;
     sensorData = sensorsMap.get(sensorReading.sensorId);
     if (!sensorData) {
-        console.log("cound find: " + sensorReading.sensorId);
         return;
     }
     await sensorData.processNewReadingAsync(sensorReading, rpId);
