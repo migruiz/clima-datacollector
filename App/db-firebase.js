@@ -2,6 +2,7 @@ var rp = require('request-promise');
 var historyWriter = require('./historyWriter.js');
 var FbCentralProjectURL = 'https://centralstationv2.firebaseio.com/'
 exports.updateFirebaseAsync = async function (reading) {
+    return;
     await updateCurrentTemperatureAsync(reading.zoneCode, reading);
     await writeIntervalsHistoryAsync(reading.zoneCode, reading);
     return;
