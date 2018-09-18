@@ -5,6 +5,7 @@ function Sensor() {
 
     var lastReading;
     var waitingForOtherSensors;
+    var coverageText="00000";
     this.processNewReading = function (sensorReading, piId) {
         if (waitingForOtherSensors) {
             //check stamps maybe it was in the queue.
@@ -18,6 +19,12 @@ function Sensor() {
         }
     }
     async function reportReadingAfterWaitingForSensorsAsync(sensorReading) {
+        
+        var newcoverageText=coverageText+sensorReading.rpi.toString();
+        newcoverageText = newcoverageText.substring(newcoverageText.length - 5, newcoverageText.length);
+        coverageText=newcoverageText;
+        sensorReading.coverage=coverageText;
+        
         waitingForOtherSensors=false;
         await sqliteRepository.insertReadingAsync(sensorReading);
         mqtt.cluster().publishData(global.fireBaseReadingTopic, sensorReading);

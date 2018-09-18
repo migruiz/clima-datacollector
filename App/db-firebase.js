@@ -3,15 +3,7 @@ var historyWriter = require('./historyWriter.js');
 var notTransmittingHandlers = [];
 var FbCentralProjectURL = 'https://centralstationv2.firebaseio.com/'
 exports.updateFirebaseAsync = async function (reading) {
-    var currentCoverage = await getCurrentZoneCoverageAsync(reading.zoneCode);
-    var newCoverage = '00001';
-    if (currentCoverage) {
-        newCoverage = currentCoverage + '1';
-        newCoverage = newCoverage.substring(newCoverage.length - 5, newCoverage.length);
-    }
     reading.zone = reading.zoneCode;
-    reading.coverage = newCoverage;
-    reading.coverageInt = (newCoverage.match(/1/g) || []).length;
     await updateCurrentTemperatureAsync(reading.zoneCode, reading);
     await writeIntervalsHistoryAsync(reading.zoneCode, reading);
     if (reading.zoneCode in notTransmittingHandlers) {

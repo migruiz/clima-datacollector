@@ -16,12 +16,7 @@ exports.extractReading = (fn,fc) => {
     //error try to recover
     if (sensorReading.channel < 1 || sensorReading.channel > 3) {
 
-        var parsedReading = getReadingFromDataMessage(partsOfStr[0]);
-        if (!parsedReading)
-            return null;
-        parsedReading.timeStamp = timeStamp;
-        parsedReading.badDataFixed = true;
-        sensorReading = parsedReading;
+        return null;
     }
     return sensorReading;
 }
@@ -33,17 +28,17 @@ exports.extractReading = (fn,fc) => {
 //    OSV2 A 1D20 1 20 0 502 0 655 2A 4C
 //    Last 4 bytes are not swapped.Here is the interpretation of these data:
 
-//    OSV2 – is a string added by decoder to identify the protocol
-//    A – is a sync quartet, it is not to be considered a data
-//    1D20 – is the Oregon device ID (here THGR122NX)
-//    1 – is the channel, values are 1, 2, 4 for channel 1, 2, 3
-//    20 – is a rolling and random value changed after each reset
-//    0 – is battery flag, battery is low when flag have bit 2 set (&4)
-//    502 – is reversed BCD temperature value (here 20.5°C)
-//    0 – is temperature sign, here “+”
-//    655 – is reversed BCD humidity value (here 55.6%)
-//    2A – is a quartet checksum starting at deviceID
-//    4C – is the crc value starting at deviceID
+//    OSV2 ï¿½ is a string added by decoder to identify the protocol
+//    A ï¿½ is a sync quartet, it is not to be considered a data
+//    1D20 ï¿½ is the Oregon device ID (here THGR122NX)
+//    1 ï¿½ is the channel, values are 1, 2, 4 for channel 1, 2, 3
+//    20 ï¿½ is a rolling and random value changed after each reset
+//    0 ï¿½ is battery flag, battery is low when flag have bit 2 set (&4)
+//    502 ï¿½ is reversed BCD temperature value (here 20.5ï¿½C)
+//    0 ï¿½ is temperature sign, here ï¿½+ï¿½
+//    655 ï¿½ is reversed BCD humidity value (here 55.6%)
+//    2A ï¿½ is a quartet checksum starting at deviceID
+//    4C ï¿½ is the crc value starting at deviceID
 function getReadingFromDataMessage(originalMessage) {
     var dataMessage = originalMessage.substring(4, 24);
     var reversedMessage = '';
