@@ -12,8 +12,8 @@ global.zones= {
     masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' },
     livingroom: { sensorId: 'E9', boilerZone: 'downstairs'},
 }
-//global.dbPath = 'c:\\temp.sqlite';
-global.dbPath = '/App/db.sqlite'
+global.dbPath = 'c:\\temp.sqlite';
+//global.dbPath = '/App/db.sqlite'
 
 global.mtqqLocalPath = process.env.MQTTLOCAL;
 //global.mtqqLocalPath = "mqtt://localhost";
@@ -29,10 +29,10 @@ for (var key in global.zones) {
 console.log(JSON.stringify(sensorsMap));
 
 
-mqtt.cluster().subscribeData(global.sensorReadingTopic, onOregonContentReceived);
+mqtt.cluster().subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
 mqtt.cluster().subscribeData(global.fireBaseReadingTopic, firebaseDb.updateFirebaseAsync);
 console.log('listenging now');
-function onOregonContentReceived(content) {
+async function onOregonContentReceivedAsync(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);
     if (!sensorReading)
         return;
@@ -43,7 +43,7 @@ function onOregonContentReceived(content) {
         return;
     }
     sensorReading.zoneCode = sensorData.zoneCode;
-    sensorData.sensor.processNewReading(sensorReading, rpId);
+    await sensorData.sensor.processNewReadingAsync(sensorReading, rpId);
 }
 
 
