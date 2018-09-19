@@ -4,13 +4,13 @@ var firebaseDb = require('./db-firebase.js');
 var sensorsCreator = require('./sensor.js');
 
 global.zones= {
-    masterroom: { sensorId: 'BC', boilerZone: 'upstairs' },
-    playroom: { sensorId: 'C1', boilerZone: 'upstairs' },
-    secondbedroom: { sensorId: 'C6', boilerZone: 'upstairs' },
-    computerroom: { sensorId: 'CC', boilerZone: 'upstairs'},
-    outside: { sensorId: 'CD' },
-    masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' },
+    masterroom: { sensorId: 'BC', boilerZone: 'upstairs' },    
     livingroom: { sensorId: 'E9', boilerZone: 'downstairs'},
+    playroom: { sensorId: 'C1', boilerZone: 'upstairs' },  
+    masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' }, 
+    computerroom: { sensorId: 'CC', boilerZone: 'upstairs'},
+    secondbedroom: { sensorId: 'C6', boilerZone: 'upstairs' },
+    outside: { sensorId: 'CD' },
 }
 //global.dbPath = 'c:\\temp.sqlite';
 global.dbPath = '/App/db.sqlite'
@@ -24,12 +24,26 @@ global.zonesReadingsTopic = 'zonesChange';
 
 var sensorsMap = new Map();
 for (var key in global.zones) {
-    sensorsMap.set(global.zones[key].sensorId, sensorsCreator.newInstance(key));
+    var sensor=sensorsCreator.newInstance(key);
+    sensorsMap.set(global.zones[key].sensorId,sensor );
+    global.zones[key].sensor=sensor;
 }
 
 
 mqtt.cluster().subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
 mqtt.cluster().subscribeData(global.fireBaseReadingTopic, firebaseDb.updateFirebaseAsync);
+mqtt.cluster().subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
+
+function OnAllZonesReadingsRequest(content) {
+    var zones=[];
+    for (var key in global.zones) {
+        var zoneSensor=global.zones[key].sensor
+        var zoneReading=zoneSensor.getLastReading();
+        zones.push(zoneReading)
+    }
+    mqtt.cluster().publishData("AllZonesReadingResponse",zones)
+}
+
 console.log('listenging now');
 async function onOregonContentReceivedAsync(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);

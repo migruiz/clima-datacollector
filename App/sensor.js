@@ -13,6 +13,9 @@ function Sensor(zoneCode) {
     var notTransmittingHandler;
     var messageReadingQueue = new PromiseQueue();
     var waitingForOtherSensors;
+    this.getLastReading=function(){
+        return lastReading;
+    }
     this.processNewReadingAsync = async function (sensorReading, piId) {
         clearInterval(notTransmittingHandler);
         startNotReceivedTransmissionCountDown();
@@ -54,8 +57,7 @@ function Sensor(zoneCode) {
         updateSensorCoverage(lastReading.rpi.toString());
         await sqliteRepository.insertReadingAsync(lastReading);
         mqtt.cluster().publishData(global.fireBaseReadingTopic, lastReading);
-        var request = { timestamp: Math.floor(new Date() / 1000), zoneReading: lastReading };
-        mqtt.cluster().publishData(global.zonesReadingsTopic, request);
+        mqtt.cluster().publishData(global.zonesReadingsTopic, lastReading);
     }
 
 
