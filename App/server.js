@@ -12,11 +12,11 @@ global.zones= {
     secondbedroom: { sensorId: 'C6', boilerZone: 'upstairs' },
     outside: { sensorId: 'CD' },
 }
-//global.dbPath = 'c:\\temp.sqlite';
-global.dbPath = '/App/db.sqlite'
+global.dbPath = 'c:\\temp.sqlite';
+//global.dbPath = '/App/db.sqlite'
 
-global.mtqqLocalPath = process.env.MQTTLOCAL;
-//global.mtqqLocalPath = "mqtt://localhost";
+//global.mtqqLocalPath = process.env.MQTTLOCAL;
+global.mtqqLocalPath = "mqtt://localhost";
 global.sensorReadingTopic = 'sensorReading';
 global.fireBaseReadingTopic = 'firebaseNewReading';
 global.zonesReadingsTopic = 'zonesChange';
@@ -29,10 +29,15 @@ for (var key in global.zones) {
     global.zones[key].sensor=sensor;
 }
 
+(async function(){
+    var mqttCluster=await mqtt.getClusterAsync() 
+    mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
+    mqttCluster.subscribeData(global.fireBaseReadingTopic, firebaseDb.updateFirebaseAsync);
+    mqttCluster.subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
+    console.log('listenging now');
+  })();
 
-mqtt.cluster().subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
-mqtt.cluster().subscribeData(global.fireBaseReadingTopic, firebaseDb.updateFirebaseAsync);
-mqtt.cluster().subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
+
 
 function OnAllZonesReadingsRequest(content) {
     var zones=[];
@@ -41,10 +46,10 @@ function OnAllZonesReadingsRequest(content) {
         var zoneReading=zoneSensor.getLastReading();
         zones.push(zoneReading)
     }
-    mqtt.cluster().publishData("AllZonesReadingResponse",zones)
+    mqttCluster.publishData("AllZonesReadingResponse",zones)
 }
 
-console.log('listenging now');
+
 async function onOregonContentReceivedAsync(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);
     if (!sensorReading)

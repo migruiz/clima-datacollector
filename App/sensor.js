@@ -42,9 +42,10 @@ function Sensor(zoneCode) {
     }
 
     function startNotReceivedTransmissionCountDown(){
-        notTransmittingHandler = setInterval(function () {
+        notTransmittingHandler = setInterval(async function () {
             updateSensorCoverage('0');
-            mqtt.cluster().publishData(global.fireBaseReadingTopic, lastReading);
+            var mqttCluster=await mqtt.getClusterAsync() 
+            mqttCluster.publishData(global.fireBaseReadingTopic, lastReading);
         }, 1000 * 60);
     }
 
@@ -56,8 +57,9 @@ function Sensor(zoneCode) {
     async function onAllSensorsReadAsync() {
         updateSensorCoverage(lastReading.rpi.toString());
         await sqliteRepository.insertReadingAsync(lastReading);
-        mqtt.cluster().publishData(global.fireBaseReadingTopic, lastReading);
-        mqtt.cluster().publishData(global.zonesReadingsTopic, lastReading);
+        var mqttCluster=await mqtt.getClusterAsync() 
+        mqttCluster.publishData(global.fireBaseReadingTopic, lastReading);
+        mqttCluster.publishData(global.zonesReadingsTopic, lastReading);
     }
 
 

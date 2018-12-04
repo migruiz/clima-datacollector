@@ -1,45 +1,64 @@
 var mqtt = require('mqtt')
 
-function MQTTClient(mqttServer) {
+class MQTTClient {
+    constructor(mqttServer) {
+        this.client=null;
+        this.mqttServer=mqttServer
+      }
+    async initAsync(){
+        this.client  = mqtt.connect(this.mqttServer)
+        var self=this
+        return new Promise(function (resolve, reject) {
+            self.client.on('connect', function () {
+                self.registerEvents()
+                resolve()
+            })
+            self.client.on('error', function (error) {
+                reject(error)
+            })
+        });
 
-    var client = mqtt.connect(mqttServer);
 
 
+    }
 
-    client.on('reconnect', function () {
-        console.log((new Date()).toString());
-        console.log('reconnect');
-    })
-    client.on('close', function () {
-        console.log((new Date()).toString());
-        console.log('close');
-    })
-    client.on('offline', function () {
-        console.log((new Date()).toString());
-        console.log('offline');
-    })
-    client.on('error', function (error) {
-        console.log((new Date()).toString());
-        console.log('error');
-        console.log(error);
-    })
-    client.on('end', function () {
-        console.log((new Date()).toString());
-        console.log('end');
-    })
+    registerEvents(){
 
-    this.subscribeData = function (topic, onData) {
-        client.subscribe(topic);
-        client.on("message", function (mtopic, message) {
+        this.client.on('reconnect', function () {
+            console.log((new Date()).toString());
+            console.log('reconnect');
+        })
+        this.client.on('close', function () {
+            console.log((new Date()).toString());
+            console.log('close');
+        })
+        this.client.on('offline', function () {
+            console.log((new Date()).toString());
+            console.log('offline');
+        })
+        this.client.on('error', function (error) {
+            console.log((new Date()).toString());
+            console.log('error');
+            console.log(error);
+        })
+        this.client.on('end', function () {
+            console.log((new Date()).toString());
+            console.log('end');
+        })
+}
+
+    subscribeData(topic, onData) {
+        this.client.subscribe(topic);
+        this.client.on("message", function (mtopic, message) {
             if (topic === mtopic) {
                 var data = JSON.parse(message);
                 onData(data);
             }
         });
     }
-    this.publishData = function (topic, data) {
+    publishData(topic, data) {
         var message = JSON.stringify(data);
-        client.publish(topic, message);
+        this.client.publish(topic, message);
     }
 }
 
@@ -48,11 +67,11 @@ function MQTTClient(mqttServer) {
 var singleton;
 
 
-exports.cluster = function () {
+exports.getClusterAsync = async function () {
 
     if (!singleton) {
         singleton = new MQTTClient(global.mtqqLocalPath);
-    }
-
+        await singleton.initAsync()
+    }    
     return singleton;
 }
