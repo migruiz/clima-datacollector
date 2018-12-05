@@ -59,7 +59,7 @@ function Sensor(zoneCode) {
         await sqliteRepository.insertReadingAsync(lastReading);
         var mqttCluster=await mqtt.getClusterAsync() 
         mqttCluster.publishData(global.fireBaseReadingTopic, lastReading);
-        mqttCluster.publishData(global.zonesReadingsTopic, lastReading);
+        mqttCluster.publishData("zoneClimateChange/"+zoneCode, lastReading);
     }
 
 

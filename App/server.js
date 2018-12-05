@@ -19,7 +19,6 @@ global.dbPath = 'c:\\temp.sqlite';
 global.mtqqLocalPath = "mqtt://localhost";
 global.sensorReadingTopic = 'sensorReading';
 global.fireBaseReadingTopic = 'firebaseNewReading';
-global.zonesReadingsTopic = 'zonesChange';
 
 
 var sensorsMap = new Map();
