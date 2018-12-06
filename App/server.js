@@ -1,6 +1,5 @@
 var mqtt = require('./mqttCluster.js');
 var fileReadingExtractor = require('./fileReadingExtractor.js');
-var firebaseDb = require('./db-firebase.js');
 var sensorsCreator = require('./sensor.js');
 
 global.zones= {
@@ -31,7 +30,6 @@ for (var key in global.zones) {
 (async function(){
     var mqttCluster=await mqtt.getClusterAsync() 
     mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
-    mqttCluster.subscribeData(global.fireBaseReadingTopic, firebaseDb.updateFirebaseAsync);
     mqttCluster.subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
     console.log('listenging now');
   })();
