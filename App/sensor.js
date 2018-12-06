@@ -60,6 +60,7 @@ function Sensor(zoneCode) {
         var mqttCluster=await mqtt.getClusterAsync() 
         mqttCluster.publishData(global.fireBaseReadingTopic, lastReading);
         mqttCluster.publishData("zoneClimateChange/"+zoneCode, lastReading);
+        mqttCluster.publishData("zoneClimateChange", lastReading);
     }
 
 
