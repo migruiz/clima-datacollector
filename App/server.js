@@ -36,13 +36,14 @@ for (var key in global.zones) {
 
 
 
-function OnAllZonesReadingsRequest(content) {
+async function OnAllZonesReadingsRequest(content) {
     var zones=[];
     for (var key in global.zones) {
         var zoneSensor=global.zones[key].sensor
         var zoneReading=zoneSensor.getLastReading();
         zones.push(zoneReading)
     }
+    var mqttCluster=await mqtt.getClusterAsync() 
     mqttCluster.publishData("AllZonesReadingResponse",zones)
 }
 
