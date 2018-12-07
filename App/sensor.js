@@ -28,7 +28,7 @@ function Sensor(zoneCode) {
                 lastReading.channel=sensorReading.channel;
                 lastReading.humidity=sensorReading.humidity;
                 lastReading.sensorId=sensorReading.sensorId;
-                lastReading.temperature=sensorReading.temperature;
+                lastReading.temperature=Math.round( sensorReading.temperature * 1e1 ) / 1e1;
                 lastReading.timeStamp=sensorReading.timeStamp;
                 lastReading.rpi = piId;
                 waitingForOtherSensors = true;
