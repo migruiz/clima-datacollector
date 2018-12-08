@@ -3,12 +3,12 @@ var fileReadingExtractor = require('./fileReadingExtractor.js');
 var sensorsCreator = require('./sensor.js');
 
 global.zones= {
-    masterroom: { sensorId: 'BC', boilerZone: 'upstairs' },    
+    masterroom: { sensorId: 'CC', boilerZone: 'upstairs' },    
     livingroom: { sensorId: 'E9', boilerZone: 'downstairs'},
-    playroom: { sensorId: 'C1', boilerZone: 'upstairs' },  
+    entrance: { sensorId: 'C1', boilerZone: 'downstairs' },  
     masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' }, 
-    computerroom: { sensorId: 'CC', boilerZone: 'upstairs'},
-    secondbedroom: { sensorId: 'C6', boilerZone: 'upstairs' },
+    computerroom: { sensorId: 'C6', boilerZone: 'upstairs'},
+    secondbedroom: { sensorId: 'F1', boilerZone: 'upstairs' },
     outside: { sensorId: 'CD' },
 }
 //global.dbPath = 'c:\\temp.sqlite';
