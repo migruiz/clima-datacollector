@@ -1,4 +1,5 @@
 var mqtt = require('./mqttCluster.js');
+var sqliteRepository = require('./sqliteSensorReadingRepository.js');
 const RESOLUTIONMINS=5
 const HOURSTOKEEP=1
 class ZoneHistory {    
@@ -7,26 +8,33 @@ class ZoneHistory {
       this.zoneCode=zoneCode;
     }
     async initAsync() {
+        var currentHistory=await sqliteRepository.deleteHistoryAsync(this.zoneCode);
+        for (var index in currentHistory) {
+            var record=currentHistory[index]
+            this.history[record.timestamp]=record
+        } 
         var mqttCluster=await mqtt.getClusterAsync();
         var self=this;
         mqttCluster.subscribeData("zoneClimateChange/"+this.zoneCode,self.processReading.bind(this));
     }
 
-    saveIntervalData(data){
+    async saveIntervalData(data){
         console.log('saving history ' + JSON.stringify(data))
+        await sqliteRepository.insertHistoryAsync(this.zoneCode,data);
     }
-    removeOldHistory(){
+    async removeOldHistory(){
         var keys=Object.keys(this.history)
         var now=Math.floor(Date.now() / 1000);
         var keepTimeStamp=now - 60 * 60 * HOURSTOKEEP
         var keysToDelete=keys.filter(k=>k<=keepTimeStamp)
         for (var key in keysToDelete) {
             delete this.history[key]
-        }       
+        } 
+        await sqliteRepository.deleteHistoryAsync(this.zoneCode,keepTimeStamp);      
         console.log('historylength@ '+ Object.keys(this.history).length);
         
     }
-    processReading(reading){
+    async processReading(reading){
         console.log(JSON.stringify(reading))
         var resolutionSecs=RESOLUTIONMINS * 60
         var nearestStamp = Math.floor(reading.timeStamp / resolutionSecs) * resolutionSecs;
@@ -37,19 +45,23 @@ class ZoneHistory {
             if (lastIntervalStartTime!=-Infinity){
                 var lastInterval=this.history[lastIntervalStartTime]
                 delete lastInterval.temperatureSum;
-                this.saveIntervalData(lastInterval)
-                this.removeOldHistory()
+                delete lastInterval.humiditySum;
+                await this.saveIntervalData(lastInterval)
+                await this.removeOldHistory()
             }
             this.history[nearestStamp]={
                 readingsCount:0,
-                temperatureSum:0
+                temperatureSum:0,
+                humiditySum:0
             }     
         }
         data=this.history[nearestStamp];
-        data.readingsCount=data.readingsCount+1   
+        data.readings=data.readings+1   
         data.temperatureSum=data.temperatureSum + reading.temperature 
-        data.temperatureAvg= Math.round( data.temperatureSum/data.readingsCount * 1e1 ) / 1e1 
-        console.log(this.zoneCode + ' ' + nearestStamp + '    ' + data.readingsCount + ' ' +  data.temperatureAvg);
+        data.humiditySum=data.humiditySum + reading.humidity
+        data.temperature= Math.round( data.temperatureSum/data.readings * 1e1 ) / 1e1 
+        data.humidity= Math.round( data.humiditySum/data.readings * 1e1 ) / 1e1 
+        console.log(this.zoneCode + ' ' + nearestStamp + '    ' + data.readings + ' ' +  data.temperature);
     }
 }
 module.exports = ZoneHistory;
