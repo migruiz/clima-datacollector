@@ -42,10 +42,8 @@ function Sensor(zoneCode) {
     }
 
     function startNotReceivedTransmissionCountDown(){
-        notTransmittingHandler = setInterval(async function () {
+        notTransmittingHandler = setInterval(function () {
             updateSensorCoverage('0');
-            var mqttCluster=await mqtt.getClusterAsync() 
-            mqttCluster.publishData(global.fireBaseReadingTopic, lastReading);
         }, 1000 * 60);
     }
 
