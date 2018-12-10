@@ -32,6 +32,7 @@ for (var key in global.zones) {
     var mqttCluster=await mqtt.getClusterAsync() 
     mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
     mqttCluster.subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
+    mqttCluster.subscribeData("AllZonesTemperatureHistoryRequest", OnAllZonesReadingsRequest);
 
 
     for (var key in global.zones) {
@@ -53,6 +54,16 @@ async function OnAllZonesReadingsRequest(content) {
     }
     var mqttCluster=await mqtt.getClusterAsync() 
     mqttCluster.publishData("AllZonesReadingResponse",zones)
+}
+async function OnAllZonesTemperatureHistoryRequest(content) {
+    var zonesHistory=[];
+    for (var key in global.zones) {
+        var history=global.zones[key].history
+        var historyEntries=history.getTemperatureHistoryList();
+        zonesHistory.push({zoneCode:key,history:historyEntries})
+    }
+    var mqttCluster=await mqtt.getClusterAsync() 
+    mqttCluster.publishData("AllZonesTemperatureHistoryResponse",zonesHistory)
 }
 
 

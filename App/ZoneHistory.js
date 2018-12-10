@@ -7,6 +7,10 @@ class ZoneHistory {
       this.history={}
       this.zoneCode=zoneCode;
     }
+    getTemperatureHistoryList(){
+        var output = Object.entries(data).map(([key, entry]) => ({timestamp:key,temperature:entry.temperature}));
+        return output
+    }
     async initAsync() {
         var currentHistory=await sqliteRepository.getHistory(this.zoneCode);
         if (currentHistory){
