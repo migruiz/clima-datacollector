@@ -17,7 +17,6 @@ global.dbPath = '/ClimaCollectorApp/db.sqlite'
 global.mtqqLocalPath = process.env.MQTTLOCAL;
 //global.mtqqLocalPath = "mqtt://localhost";
 global.sensorReadingTopic = 'sensorReading';
-global.fireBaseReadingTopic = 'firebaseNewReading';
 
 
 var sensorsMap = new Map();
