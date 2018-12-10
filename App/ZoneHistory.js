@@ -1,5 +1,5 @@
 var mqtt = require('./mqttCluster.js');
-const RESOLUTIONMINS=2
+const RESOLUTIONMINS=5
 const HOURSTOKEEP=1
 class ZoneHistory {    
     constructor(zoneCode) {
@@ -13,7 +13,7 @@ class ZoneHistory {
     }
 
     saveIntervalData(data){
-        console.log(JSON.stringify(data))
+        console.log('saving history ' + JSON.stringify(data))
     }
     removeOldHistory(){
         var keys=Object.keys(this.history)
@@ -22,7 +22,8 @@ class ZoneHistory {
         var keysToDelete=keys.filter(k=>k<=keepTimeStamp)
         for (var key in keysToDelete) {
             delete this.history[key]
-        }        
+        }       
+        console.log('historylength@ '+ Object.keys(this.history).length);
         
     }
     processReading(reading){
@@ -34,7 +35,9 @@ class ZoneHistory {
             var keys=Object.keys(this.history)
             var lastIntervalStartTime=Math.max.apply(null,keys);
             if (lastIntervalStartTime!=-Infinity){
-                this.saveIntervalData(this.history[lastIntervalStartTime])
+                var lastInterval=this.history[lastIntervalStartTime]
+                delete lastInterval.temperatureSum;
+                this.saveIntervalData(lastInterval)
                 this.removeOldHistory()
             }
             this.history[nearestStamp]={
