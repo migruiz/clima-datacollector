@@ -56,9 +56,8 @@ function Sensor(zoneCode) {
     }
     async function onAllSensorsReadAsync() {
         updateSensorCoverage(lastReading.rpi.toString());
-        await sqliteRepository.insertReadingAsync(lastReading);
+        //await sqliteRepository.insertReadingAsync(lastReading);
         var mqttCluster=await mqtt.getClusterAsync() 
-        mqttCluster.publishData(global.fireBaseReadingTopic, lastReading);
         mqttCluster.publishData("zoneClimateChange/"+zoneCode, lastReading);
         mqttCluster.publishData("zoneClimateChange", lastReading);
     }

@@ -9,10 +9,12 @@ class MQTTClient {
         this.client  = mqtt.connect(this.mqttServer)
         var self=this
         return new Promise(function (resolve, reject) {
-            self.client.on('connect', function () {
+            function onConnect(){
                 self.registerEvents()
                 resolve()
-            })
+                self.client.removeListener('connect', onConnect)
+            }
+            self.client.on('connect', onConnect)
             self.client.on('error', function (error) {
                 reject(error)
             })
@@ -20,6 +22,9 @@ class MQTTClient {
 
 
 
+    }
+    onConnect(){
+        
     }
 
     registerEvents(){

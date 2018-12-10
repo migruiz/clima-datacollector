@@ -1,6 +1,7 @@
 var mqtt = require('./mqttCluster.js');
 var fileReadingExtractor = require('./fileReadingExtractor.js');
 var sensorsCreator = require('./sensor.js');
+const ZoneHistory = require('./ZoneHistory.js');
 
 global.zones= {
     masterroom: { sensorId: 'CC', boilerZone: 'upstairs' },    
@@ -15,9 +16,8 @@ global.zones= {
 global.dbPath = '/ClimaCollectorApp/db.sqlite'
 
 global.mtqqLocalPath = process.env.MQTTLOCAL;
-//global.mtqqLocalPath = "mqtt://localhost";
+//global.mtqqLocalPath = "mqtt://piscos.tk";
 global.sensorReadingTopic = 'sensorReading';
-global.fireBaseReadingTopic = 'firebaseNewReading';
 
 
 var sensorsMap = new Map();
@@ -25,12 +25,20 @@ for (var key in global.zones) {
     var sensor=sensorsCreator.newInstance(key);
     sensorsMap.set(global.zones[key].sensorId,sensor );
     global.zones[key].sensor=sensor;
+    global.zones[key].history=new ZoneHistory(key);
 }
 
 (async function(){
     var mqttCluster=await mqtt.getClusterAsync() 
     mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
     mqttCluster.subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
+
+
+    for (var key in global.zones) {
+        var zoneHistory=global.zones[key].history
+        await zoneHistory.initAsync();        
+    }
+
     console.log('listenging now');
   })();
 
