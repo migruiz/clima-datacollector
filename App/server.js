@@ -12,11 +12,11 @@ global.zones= {
     secondbedroom: { sensorId: 'F1', boilerZone: 'upstairs' },
     outside: { sensorId: 'CD' },
 }
-global.dbPath = 'c:\\temp.sqlite';
-//global.dbPath = '/ClimaCollectorApp/db.sqlite'
+//global.dbPath = 'c:\\temp.sqlite';
+global.dbPath = '/ClimaCollectorApp/db.sqlite'
 
-//global.mtqqLocalPath = process.env.MQTTLOCAL;
-global.mtqqLocalPath = "mqtt://piscos.tk";
+global.mtqqLocalPath = process.env.MQTTLOCAL;
+//global.mtqqLocalPath = "mqtt://piscos.tk";
 global.sensorReadingTopic = 'sensorReading';
 
 
@@ -30,8 +30,8 @@ for (var key in global.zones) {
 
 (async function(){
     var mqttCluster=await mqtt.getClusterAsync() 
-    //mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
-    //mqttCluster.subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
+    mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
+    mqttCluster.subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
 
 
     for (var key in global.zones) {
