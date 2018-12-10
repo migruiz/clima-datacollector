@@ -12,7 +12,7 @@ global.zones= {
     secondbedroom: { sensorId: 'F1', boilerZone: 'upstairs' },
     outside: { sensorId: 'CD' },
 }
-//global.dbPath = 'c:\\temp.sqlite';
+global.dbPath = 'c:\\temp.sqlite';
 //global.dbPath = '/ClimaCollectorApp/db.sqlite'
 
 //global.mtqqLocalPath = process.env.MQTTLOCAL;

@@ -1,6 +1,6 @@
 var mqtt = require('./mqttCluster.js');
 var sqliteRepository = require('./sqliteSensorReadingRepository.js');
-const RESOLUTIONMINS=5
+const RESOLUTIONMINS=1
 const HOURSTOKEEP=1
 class ZoneHistory {    
     constructor(zoneCode) {
@@ -8,11 +8,13 @@ class ZoneHistory {
       this.zoneCode=zoneCode;
     }
     async initAsync() {
-        var currentHistory=await sqliteRepository.deleteHistoryAsync(this.zoneCode);
-        for (var index in currentHistory) {
-            var record=currentHistory[index]
-            this.history[record.timestamp]=record
-        } 
+        var currentHistory=await sqliteRepository.getHistory(this.zoneCode);
+        if (currentHistory){
+            for (var index in currentHistory) {
+                var record=currentHistory[index]
+                this.history[record.timestamp]=record
+            } 
+    }
         var mqttCluster=await mqtt.getClusterAsync();
         var self=this;
         mqttCluster.subscribeData("zoneClimateChange/"+this.zoneCode,self.processReading.bind(this));
@@ -50,7 +52,7 @@ class ZoneHistory {
                 await this.removeOldHistory()
             }
             this.history[nearestStamp]={
-                readingsCount:0,
+                readings:0,
                 temperatureSum:0,
                 humiditySum:0
             }     

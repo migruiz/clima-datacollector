@@ -17,10 +17,9 @@ versionHistory.push(`CREATE TABLE ZonesHistory (
     ,zoneCode text not null collate nocase
     ,timestamp int
     ,temperature real
-    ,readings real
+    ,readings int
     ,humidity real
     );`);
-versionHistory.push('CREATE UNIQUE INDEX IX_ZonesTemperature ON ZonesTemperature (zoneCode ASC);');
 versionHistory.push('CREATE UNIQUE INDEX IX_ZonesHistory ON ZonesHistory (zoneCode ASC,timestamp ASC);');
 
 var singleton;
