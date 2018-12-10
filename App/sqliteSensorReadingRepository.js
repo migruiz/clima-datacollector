@@ -11,7 +11,7 @@ exports.insertReadingAsync = async function (data) {
         }));
 }
 exports.insertHistoryAsync = async function (zoneCode,lastIntervalStartTime,data) {
-    await zonesdb.instance().operate(db=>db.runAsync("INSERT INTO ZonesHistory(zoneCode,temperature,humidity,readings,timestamp) values ($zoneCode,$temperature,$humidity,$readings,$timestamp)",
+    await zonesdb.instance().operate(db=>db.runAsync("REPLACE INTO ZonesHistory(zoneCode,temperature,humidity,readings,timestamp) values ($zoneCode,$temperature,$humidity,$readings,$timestamp)",
         {
             $zoneCode: zoneCode,
             $readings: data.readings,

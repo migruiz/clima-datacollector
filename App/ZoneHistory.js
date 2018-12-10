@@ -1,6 +1,6 @@
 var mqtt = require('./mqttCluster.js');
 var sqliteRepository = require('./sqliteSensorReadingRepository.js');
-const RESOLUTIONMINS=1
+const RESOLUTIONMINS=5
 const HOURSTOKEEP=1
 class ZoneHistory {    
     constructor(zoneCode) {
@@ -12,6 +12,8 @@ class ZoneHistory {
         if (currentHistory){
             for (var index in currentHistory) {
                 var record=currentHistory[index]
+                record.temperatureSum=record.temperature;
+                record.humiditySum=record.humidity;
                 this.history[record.timestamp]=record
             } 
     }
