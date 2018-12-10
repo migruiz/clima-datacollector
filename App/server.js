@@ -32,7 +32,7 @@ for (var key in global.zones) {
     var mqttCluster=await mqtt.getClusterAsync() 
     mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
     mqttCluster.subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
-    mqttCluster.subscribeData("AllZonesTemperatureHistoryRequest", OnAllZonesReadingsRequest);
+    mqttCluster.subscribeData("AllZonesTemperatureHistoryRequest", OnAllZonesTemperatureHistoryRequest);
 
 
     for (var key in global.zones) {
