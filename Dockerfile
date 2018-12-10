@@ -7,14 +7,14 @@ RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
 RUN apt-get update && \
 apt-get install -yqq --no-install-recommends g++ gcc make && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /App/
-COPY App/package.json  /App/package.json
+RUN mkdir /ClimaCollectorApp/
+COPY App/package.json  /ClimaCollectorApp/package.json
 
-RUN cd /App \
+RUN cd /ClimaCollectorApp \
 && npm  install 
 
 
-COPY App /App
+COPY App /ClimaCollectorApp
 
 
 
@@ -22,6 +22,4 @@ RUN [ "cross-build-end" ]
 
 
 
-ENV TEMPQUEUEURL amqp://pi:pi@192.168.0.96
-
-ENTRYPOINT ["node","/App/server.js"]
+ENTRYPOINT ["node","/ClimaCollectorApp/server.js"]

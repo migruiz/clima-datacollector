@@ -31,22 +31,17 @@
   <ItemGroup>
     <Compile Include="db-firebase.js" />
     <Compile Include="db-sqlite.js" />
-    <Compile Include="firebaseSyncReceiver.js" />
-    <Compile Include="oregonSensorReceiver.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="rabbitQueueListenerConnector.js" />
+    <Compile Include="mqttCluster.js" />
     <Compile Include="ReadingValidator.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="RemoteDebug.js" />
     <Compile Include="sensor.js" />
     <Compile Include="server.js" />
     <Compile Include="sqliteSensorReadingRepository.js" />
     <Content Include="historyWriter.js" />
     <Content Include="package.json" />
     <Content Include="fileReadingExtractor.js" />
-    <Content Include="README.md" />
+    <Content Include="zonesDatabase.js" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />

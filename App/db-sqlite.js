@@ -1,129 +1,94 @@
+var PromiseQueue = require('a-promise-queue');
+function SQLDB(path, structure) {
 
-var async = require('asyncawait/async');
-var await = require('asyncawait/await');
-var locks = require('locks');
-
-require('sqlite3').Database.prototype.getAsync = function (sql, params) {
-    var dbinner = this;
-    return new Promise(function (resolve, reject) {
-        dbinner.get(sql, params, function (err, data) {
-            if (err !== null) return reject(err);
-            resolve(data);
+    function getAsync(sql, params) {
+        return new Promise(function (resolve, reject) {
+            db.get(sql, params, function (err, data) {
+                if (err !== null) return reject(err);
+                resolve(data);
+            });
         });
-    });
-};
-require('sqlite3').Database.prototype.allAsync = function (sql, params) {
-    var dbinner = this;
-    return new Promise(function (resolve, reject) {
-        dbinner.all(sql, params, function (err, data) {
-            if (err !== null) return reject(err);
-            resolve(data);
+    };
+    this.getAsync = getAsync;
+    function allAsync(sql, params) {
+        return new Promise(function (resolve, reject) {
+            db.all(sql, params, function (err, data) {
+                if (err !== null) return reject(err);
+                resolve(data);
+            });
         });
-    });
-};
-require('sqlite3').Database.prototype.runAsync = function (sql, params) {
-    var dbinner = this;
-    return new Promise(function (resolve, reject) {
-        dbinner.run(sql, params, function (err) {
-            if (err !== null) return reject(err);
-            resolve();
+    };
+    this.allAsync = allAsync;
+    function runAsync(sql, params) {
+        return new Promise(function (resolve, reject) {
+            db.run(sql, params, function (err) {
+                if (err !== null) return reject(err);
+                resolve();
+            });
         });
-    });
-};
-
-
-var singleton = (function () {
-    var instance;
-
+    };
+    this.runAsync = runAsync;
     function createInstance() {
 
         var sqlite3 = require('sqlite3').verbose();
-        var db = new sqlite3.Database('/App/test.sqlite');
-        //var db = new sqlite3.Database('D:\\Documents\\valves.sqlite');
-        var mutex = locks.createMutex();
-        return { db: db, mutex: mutex };
+        var db = new sqlite3.Database(path);
+        return db;
     }
-    instance = createInstance();
-    var versionHistory = [];
-    versionHistory.push(`CREATE TABLE ZonesTemperature (
-        id integer primary key
-        ,zoneCode text not null collate nocase
-        ,sensorId text not null collate nocase
-        ,channel int
-        ,temperature real
-        ,humidity real
-        ,timestamp int
-        );`);
-    versionHistory.push('CREATE UNIQUE INDEX IX_ZonesTemperature ON ZonesTemperature (zoneCode ASC);');
+
+    var db;
+    this.initAsync=initAsync;
+
+    async function initAsync() {
+        db=createInstance();
+        var data = await getAsync("PRAGMA USER_VERSION");
+        //var currentVersionNo = data.USER_VERSION;
+        var currentVersionNo = data.user_version;
+        var newVersionNo = structure.length;
+        if (newVersionNo > currentVersionNo) {
+            await runAsync("BEGIN IMMEDIATE TRANSACTION");
+            try {
+                await applyDatabaseConfigurationChangesAsync(currentVersionNo, structure);
+                await runAsync("PRAGMA USER_VERSION=" + newVersionNo.toString());
+                await runAsync("COMMIT TRANSACTION");
+            }
+            catch (err) {
+                await runAsync("ROLLBACK");
+                throw err;
+            }
+
+        }
 
 
-    function applyDatabaseConfigurationChanges(db, currentVersion, versions) {
+    }
+    async function applyDatabaseConfigurationChangesAsync(currentVersion, versions) {
         for (var i = currentVersion; i < versions.length; i++) {
             var expr = versions[i];
-            // console.log(expr);
-            await(db.runAsync(expr));
+            await runAsync(expr);
         }
     }
 
-    var suspendable = async(function () {
-        var result = await(operateDatabaseAsync(function (db) {
-            var data = await(db.getAsync("PRAGMA USER_VERSION"));
-            var currentVersionNo = data.USER_VERSION;
-            var newVersionNo = versionHistory.length;
-            if (newVersionNo > currentVersionNo) {
-                await(db.runAsync("BEGIN IMMEDIATE TRANSACTION"));
-                try {
-                    applyDatabaseConfigurationChanges(db, currentVersionNo, versionHistory);
-                    await(db.runAsync("PRAGMA USER_VERSION=" + newVersionNo.toString()));
-                    await(db.runAsync("COMMIT TRANSACTION"));
-                }
-                catch (err) {
-                    await(db.runAsync("ROLLBACK"));
-                    throw err;
-                }
-
-            }
-        }));
-        return result;
-    });
-    suspendable();
 
 
-
-    function operateDatabaseAsync(OperationAsyncFx) {
-
-        return new Promise(function (resolve, reject) {
-
-
-            var db = instance.db;
-            var mutex = instance.mutex;
-            mutex.lock(function () {
-                try {
-                    var result = await(OperationAsyncFx(db));
-                    resolve(result);
-                }
-                catch (err) {
-                    return reject(err);
-                }
-                finally {
-                    mutex.unlock();
-                }
-            });
-        });
-
-
-        return overallResult;
-    }
-    return {
-        operateDatabaseAsync: operateDatabaseAsync
-    };
-})();
-
-
-
-
-exports.database = function () {
-
-    return singleton;
 }
+
+function SQLDBWrapper(path, structure){
+    var sqlDB
+    var queue = new PromiseQueue();  
+    this.operate=async function(operation){
+        return await queue.add(async function() {
+            if (!sqlDB){
+                sqlDB=new SQLDB(path,structure);
+                await sqlDB.initAsync();
+            }
+            return await operation(sqlDB);
+        });
+    }
+}
+
+
+
+
+
+
+exports.SQLDB = SQLDBWrapper;
 

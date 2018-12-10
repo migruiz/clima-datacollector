@@ -1,22 +1,17 @@
-var await = require('asyncawait/await');
-var sqliteDb = require('./db-sqlite.js');
-exports.insertReadingAsync = function (reading) {
-    sqliteDb.database().operateDatabaseAsync(function (db) {
-        await(db.runAsync("REPLACE INTO ZonesTemperature(zoneCode,sensorId,channel,temperature,humidity,timestamp) values ($zoneCode,$sensorId,$channel,$temperature,$humidity,$timestamp)",
-            {
-                $zoneCode: reading.zoneCode,
-                $sensorId: reading.sensorId,
-                $channel: reading.channel,
-                $temperature: reading.temperature,
-                $humidity: reading.humidity,
-                $timestamp: reading.timeStamp
-            }));
-    });
+var zonesdb = require('./zonesDatabase');
+exports.insertReadingAsync = async function (reading) {
+    await zonesdb.instance().operate(db=>db.runAsync("REPLACE INTO ZonesTemperature(zoneCode,sensorId,channel,temperature,humidity,timestamp) values ($zoneCode,$sensorId,$channel,$temperature,$humidity,$timestamp)",
+        {
+            $zoneCode: reading.zoneCode,
+            $sensorId: reading.sensorId,
+            $channel: reading.channel,
+            $temperature: reading.temperature,
+            $humidity: reading.humidity,
+            $timestamp: reading.timeStamp
+        }));
 }
-exports.getCurrentReadingsAsync = function () {
-    var result = await(sqliteDb.database().operateDatabaseAsync(function (db) {
-        var valveData = await(db.allAsync("select zoneCode,temperature,timestamp from ZonesTemperature"));
-        return valveData;
-    }));
-    return result;
+exports.getCurrentReadingsAsync =async  function () {
+    var valveData = await zonesdb.instance().operate(db=>db.allAsync("select zoneCode,temperature,timestamp from ZonesTemperature"));
+    return valveData;
+
 }

@@ -1,109 +1,68 @@
-var await = require('asyncawait/await');
-var async = require('asyncawait/async');
-var locks = require('locks');
-var amqp = require('amqplib');
+var mqtt = require('./mqttCluster.js');
 var sqliteRepository = require('./sqliteSensorReadingRepository.js');
+var PromiseQueue = require('a-promise-queue');
+function Sensor(zoneCode) {
 
-function Sensor(sensorCode) {
-
-    var lastReading;
-    var waitingForOtherSensorsMutex = locks.createMutex();
-    this.processNewReadingAsync = function (sensorReading, piId) {
-        await(safeProcessNewReading(sensorReading, piId));
+    
+    var lastReading={
+        coverage:"000000",
+        zoneCode:zoneCode
     }
+    startNotReceivedTransmissionCountDown();
+
+    var notTransmittingHandler;
+    var messageReadingQueue = new PromiseQueue();
     var waitingForOtherSensors;
-    function processNewReadingAsync(sensorReading, piId) {
-        if (waitingForOtherSensors) {
-            //check stamps maybe it was in the queue.
-            lastReading.rpi = lastReading.rpi | piId;
-        }
-        else {
-            sensorReading.rpi = piId;
-            lastReading = sensorReading;
-            waitingForOtherSensors = true;
-            setTimeout(function () {                
-                var asyncFx = async(function () {
-                    await(reportReadingAfterWaitingForSensorsAsync(lastReading));
-                });
-                asyncFx();
-            }, 1000 * 5);
-        }
+    this.getLastReading=function(){
+        return lastReading;
     }
-    function reportReadingAfterWaitingForSensorsAsync(sensorReading) {
-        return new Promise(function (resolve, reject) {
-
-            waitingForOtherSensorsMutex.lock(function () {
-                try {
+    this.processNewReadingAsync = async function (sensorReading, piId) {
+        clearInterval(notTransmittingHandler);
+        startNotReceivedTransmissionCountDown();
+        //console.log((new Date().getTime())+' '+sensorReading.sensorId+' '+piId.toString());
+        return await messageReadingQueue.add(async function () {
+            if (waitingForOtherSensors) {
+                lastReading.rpi = lastReading.rpi | piId;
+            }
+            else {
+                lastReading.channel=sensorReading.channel;
+                lastReading.humidity=sensorReading.humidity;
+                lastReading.sensorId=sensorReading.sensorId;
+                lastReading.temperature=Math.round( sensorReading.temperature * 1e1 ) / 1e1;
+                lastReading.timeStamp=sensorReading.timeStamp;
+                lastReading.rpi = piId;
+                waitingForOtherSensors = true;
+                setTimeout(() => 
+                {                    
                     waitingForOtherSensors = false;
-                    await(reportReadingAsync(sensorReading));
-                    resolve();
-                }
-                catch (err) {
-                    return reject(err);
-                }
-                finally {
-                    waitingForOtherSensorsMutex.unlock();
-                }
-            });
-        });
-    }
-    function reportReadingAsync(sensorReading) {
-        await(sqliteRepository.insertReadingAsync(sensorReading));
-        sendChangeToFirebasSync(process.env.TEMPQUEUEURL, sensorReading);
-        var zonesReadings = await(sqliteRepository.getCurrentReadingsAsync());
-        var request = { timestamp: Math.floor(new Date() / 1000), zoneReading: sensorReading };
-        reportCurrentZoneReading(process.env.TEMPQUEUEURL, request);
-    }
-
-    function safeProcessNewReading(sensorReading,piId) {
-        return new Promise(function (resolve, reject) {
-
-            waitingForOtherSensorsMutex.lock(function () {
-                try {
-                    await(processNewReadingAsync(sensorReading, piId));
-                    resolve();
-                }
-                catch (err) {
-                    return reject(err);
-                }
-                finally {
-                    waitingForOtherSensorsMutex.unlock();
-                }
-            });
+                    onAllSensorsReadAsync();
+                }, 1000 * 2);
+            }
         });
     }
 
-    function reportCurrentZoneReading(intranetAMQPURI, request) {
-        amqp.connect(intranetAMQPURI).then(function (conn) {
-            return conn.createChannel().then(function (ch) {
-                var q = 'zoneReadingUpdate';
-                var msg = JSON.stringify(request);
-
-                var ok = ch.assertQueue(q, { durable: false });
-
-                return ok.then(function (_qok) {
-                    ch.sendToQueue(q, Buffer.from(msg));
-                    return ch.close();
-                });
-            }).finally(function () { conn.close(); });
-        }).catch(console.warn);
+    function startNotReceivedTransmissionCountDown(){
+        notTransmittingHandler = setInterval(async function () {
+            updateSensorCoverage('0');
+            var mqttCluster=await mqtt.getClusterAsync() 
+            mqttCluster.publishData(global.fireBaseReadingTopic, lastReading);
+        }, 1000 * 60);
     }
 
-    function sendChangeToFirebasSync(intranetAMQPURI, sensorReading) {
-        amqp.connect(intranetAMQPURI).then(function (conn) {
-            return conn.createChannel().then(function (ch) {
-                var q = 'firebaseZoneReadingSyncQueue';
-                var msg = JSON.stringify(sensorReading);
-
-                var ok = ch.assertQueue(q, { durable: true });
-
-                return ok.then(function (_qok) {
-                    ch.sendToQueue(q, Buffer.from(msg));
-                    return ch.close();
-                });
-            }).finally(function () { conn.close(); });
-        }).catch(console.warn);
+    function updateSensorCoverage(symbol){
+        var newcoverageText = lastReading.coverage + symbol;
+        newcoverageText = newcoverageText.substring(newcoverageText.length - 6, newcoverageText.length);
+        lastReading.coverage = newcoverageText;
     }
+    async function onAllSensorsReadAsync() {
+        updateSensorCoverage(lastReading.rpi.toString());
+        await sqliteRepository.insertReadingAsync(lastReading);
+        var mqttCluster=await mqtt.getClusterAsync() 
+        mqttCluster.publishData(global.fireBaseReadingTopic, lastReading);
+        mqttCluster.publishData("zoneClimateChange/"+zoneCode, lastReading);
+        mqttCluster.publishData("zoneClimateChange", lastReading);
+    }
+
 
 
 }

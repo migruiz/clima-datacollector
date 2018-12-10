@@ -1,49 +1,63 @@
-var amqp = require('amqplib');
+var mqtt = require('./mqttCluster.js');
 var fileReadingExtractor = require('./fileReadingExtractor.js');
-var firebaseSyncReceiver = require('./firebaseSyncReceiver.js');
-var async = require('asyncawait/async');
-var await = require('asyncawait/await');
-var oregonSensorReceiver = require('./oregonSensorReceiver.js');
 var sensorsCreator = require('./sensor.js');
 
-global.map = {
-    BC: "masterroom",
-    C1: "entrance",
-    C6: "secondbedroom",
-    CC: "computerroom",
-    CD: "outside",
-    E0: "masterbathroom",
-    E9: "livingroom"
-};
+global.zones= {
+    masterroom: { sensorId: 'CC', boilerZone: 'upstairs' },    
+    livingroom: { sensorId: 'E9', boilerZone: 'downstairs'},
+    entrance: { sensorId: 'C1', boilerZone: 'downstairs' },  
+    masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' }, 
+    computerroom: { sensorId: 'C6', boilerZone: 'upstairs'},
+    secondbedroom: { sensorId: 'F1', boilerZone: 'upstairs' },
+    outside: { sensorId: 'CD' },
+}
+//global.dbPath = 'c:\\temp.sqlite';
+global.dbPath = '/ClimaCollectorApp/db.sqlite'
 
-var sensors = {
-    masterroom: sensorsCreator.newInstance("masterroom"),
-    entrance: sensorsCreator.newInstance("entrance"),
-    secondbedroom: sensorsCreator.newInstance("secondbedroom"),
-    computerroom: sensorsCreator.newInstance("computerroom"),
-    outside: sensorsCreator.newInstance("outside"),
-    masterbathroom: sensorsCreator.newInstance("masterbathroom"),
-    livingroom: sensorsCreator.newInstance("livingroom")
-};
+global.mtqqLocalPath = process.env.MQTTLOCAL;
+//global.mtqqLocalPath = "mqtt://localhost";
+global.sensorReadingTopic = 'sensorReading';
+global.fireBaseReadingTopic = 'firebaseNewReading';
 
 
-firebaseSyncReceiver.startMonitoring(process.env.TEMPQUEUEURL);
+var sensorsMap = new Map();
+for (var key in global.zones) {
+    var sensor=sensorsCreator.newInstance(key);
+    sensorsMap.set(global.zones[key].sensorId,sensor );
+    global.zones[key].sensor=sensor;
+}
 
-oregonSensorReceiver.startMonitoring(process.env.TEMPQUEUEURL, onOregonContentReceivedAsync);
-console.log('listenging now');
-function onOregonContentReceivedAsync(content) {
+(async function(){
+    var mqttCluster=await mqtt.getClusterAsync() 
+    mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
+    mqttCluster.subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
+    console.log('listenging now');
+  })();
+
+
+
+async function OnAllZonesReadingsRequest(content) {
+    var zones=[];
+    for (var key in global.zones) {
+        var zoneSensor=global.zones[key].sensor
+        var zoneReading=zoneSensor.getLastReading();
+        zones.push(zoneReading)
+    }
+    var mqttCluster=await mqtt.getClusterAsync() 
+    mqttCluster.publishData("AllZonesReadingResponse",zones)
+}
+
+
+async function onOregonContentReceivedAsync(content) {
     var sensorReading = fileReadingExtractor.extractReading(content.fileName, content.data);
     if (!sensorReading)
         return;
     var rpId = content.piId;
-    sensorReading.zoneCode = global.map[sensorReading.sensorId];   
-    if (!sensorReading.zoneCode) {
-        console.log("cound find: " + sensorReading.zoneCode);
-        console.log(JSON.stringify(content));
+    sensorData = sensorsMap.get(sensorReading.sensorId);
+    if (!sensorData) {
         return;
     }
-    var sensor = sensors[sensorReading.zoneCode];
-    sensor.processNewReadingAsync(sensorReading, rpId);
+    await sensorData.processNewReadingAsync(sensorReading, rpId);
 }
 
 
