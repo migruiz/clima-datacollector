@@ -16,7 +16,7 @@ RUN cd /ClimaCollectorApp \
 
 COPY App /ClimaCollectorApp
 
-
+RUN mkdir /ClimaCollectorApp/DB
 
 RUN [ "cross-build-end" ]  
 

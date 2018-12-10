@@ -13,7 +13,7 @@ global.zones= {
     outside: { sensorId: 'CD' },
 }
 //global.dbPath = 'c:\\temp.sqlite';
-global.dbPath = '/ClimaCollectorApp/db.sqlite'
+global.dbPath = '/ClimaCollectorApp/DB/db.sqlite'
 
 global.mtqqLocalPath = process.env.MQTTLOCAL;
 //global.mtqqLocalPath = "mqtt://piscos.tk";

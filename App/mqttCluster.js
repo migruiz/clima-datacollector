@@ -10,9 +10,9 @@ class MQTTClient {
         var self=this
         return new Promise(function (resolve, reject) {
             function onConnect(){
-                self.registerEvents()
-                resolve()
+                self.registerEvents()                
                 self.client.removeListener('connect', onConnect)
+                resolve()
             }
             self.client.on('connect', onConnect)
             self.client.on('error', function (error) {
@@ -22,9 +22,6 @@ class MQTTClient {
 
 
 
-    }
-    onConnect(){
-        
     }
 
     registerEvents(){
