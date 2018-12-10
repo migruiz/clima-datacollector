@@ -10,14 +10,14 @@ exports.insertReadingAsync = async function (data) {
             $timestamp: data.timeStamp
         }));
 }
-exports.insertHistoryAsync = async function (zoneCode,data) {
+exports.insertHistoryAsync = async function (zoneCode,lastIntervalStartTime,data) {
     await zonesdb.instance().operate(db=>db.runAsync("INSERT INTO ZonesHistory(zoneCode,temperature,humidity,readings,timestamp) values ($zoneCode,$temperature,$humidity,$readings,$timestamp)",
         {
             $zoneCode: zoneCode,
             $readings: data.readings,
             $temperature: data.temperature,
             $humidity: data.humidity,
-            $timestamp: data.timestamp
+            $timestamp: lastIntervalStartTime
         }));
 }
 exports.deleteHistoryAsync = async function (zoneCode,timeStampLimit) {

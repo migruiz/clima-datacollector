@@ -20,9 +20,9 @@ class ZoneHistory {
         mqttCluster.subscribeData("zoneClimateChange/"+this.zoneCode,self.processReading.bind(this));
     }
 
-    async saveIntervalData(data){
+    async saveIntervalData(lastIntervalStartTime,data){
         console.log('saving history ' + JSON.stringify(data))
-        await sqliteRepository.insertHistoryAsync(this.zoneCode,data);
+        await sqliteRepository.insertHistoryAsync(this.zoneCode,lastIntervalStartTime,data);
     }
     async removeOldHistory(){
         var keys=Object.keys(this.history)
@@ -48,7 +48,7 @@ class ZoneHistory {
                 var lastInterval=this.history[lastIntervalStartTime]
                 delete lastInterval.temperatureSum;
                 delete lastInterval.humiditySum;
-                await this.saveIntervalData(lastInterval)
+                await this.saveIntervalData(lastIntervalStartTime,lastInterval)
                 await this.removeOldHistory()
             }
             this.history[nearestStamp]={
