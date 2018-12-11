@@ -27,7 +27,7 @@ class ZoneHistory {
     }
 
     async saveIntervalData(lastIntervalStartTime,data){
-        console.log('saving history ' + JSON.stringify(data))
+        //console.log('saving history ' + JSON.stringify(data))
         await sqliteRepository.insertHistoryAsync(this.zoneCode,lastIntervalStartTime,data);
     }
     async removeOldHistory(){
@@ -39,11 +39,11 @@ class ZoneHistory {
             delete this.history[key]
         } 
         await sqliteRepository.deleteHistoryAsync(this.zoneCode,keepTimeStamp);      
-        console.log('historylength@ '+ Object.keys(this.history).length);
+        //console.log('historylength@ '+ Object.keys(this.history).length);
         
     }
     async processReading(reading){
-        console.log(JSON.stringify(reading))
+        //console.log(JSON.stringify(reading))
         var resolutionSecs=RESOLUTIONMINS * 60
         var nearestStamp = Math.floor(reading.timeStamp / resolutionSecs) * resolutionSecs;
         var data=this.history[nearestStamp];
@@ -69,7 +69,7 @@ class ZoneHistory {
         data.humiditySum=data.humiditySum + reading.humidity
         data.temperature= Math.round( data.temperatureSum/data.readings * 1e1 ) / 1e1 
         data.humidity= Math.round( data.humiditySum/data.readings * 1e1 ) / 1e1 
-        console.log(this.zoneCode + ' ' + nearestStamp + '    ' + data.readings + ' ' +  data.temperature);
+        //console.log(this.zoneCode + ' ' + nearestStamp + '    ' + data.readings + ' ' +  data.temperature);
     }
 }
 module.exports = ZoneHistory;
