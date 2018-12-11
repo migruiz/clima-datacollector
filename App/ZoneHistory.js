@@ -36,6 +36,8 @@ class ZoneHistory {
         var keepTimeStamp=now - 60 * 60 * HOURSTOKEEP
         console.log("timestamp to keep "+ keepTimeStamp)
         var keysToDelete=keys.filter(k=>k<=keepTimeStamp)
+        console.log('keys '+ JSON.stringify(keys));
+        console.log('keysToDelete'+ JSON.stringify(keysToDelete));
         for (var key in keysToDelete) {
             delete this.history[key]
         } 
