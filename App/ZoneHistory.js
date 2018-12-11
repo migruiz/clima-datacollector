@@ -37,9 +37,12 @@ class ZoneHistory {
         var keysToDelete=keys.filter(k=>parseInt(k)<=keepTimeStamp)
         //console.log('keys '+ JSON.stringify(keys));
         
-        for (var key in keysToDelete) {
+        for (let index = 0; index < keysToDelete.length; index++) {
+            const key = keysToDelete[index];
             delete this.history[key]
-        } 
+        }
+
+        
         await sqliteRepository.deleteHistoryAsync(this.zoneCode,keepTimeStamp);      
         //console.log('historylength@ '+ Object.keys(this.history).length);
         
