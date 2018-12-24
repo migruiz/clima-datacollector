@@ -22,4 +22,4 @@ RUN [ "cross-build-end" ]
 
 
 
-ENTRYPOINT ["node","--expose-gc","/ClimaCollectorApp/server.js"]
+ENTRYPOINT ["node", '--js-flags="--expose-gc"',"/ClimaCollectorApp/server.js"]
