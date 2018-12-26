@@ -45,7 +45,7 @@ class ZoneHistory {
         
         await sqliteRepository.deleteHistoryAsync(this.zoneCode,keepTimeStamp);      
         //console.log('historylength@ '+ Object.keys(this.history).length);
-        global.gc(true);
+        //global.gc(true);
     }
     async processReading(reading){
         //console.log(JSON.stringify(reading))
