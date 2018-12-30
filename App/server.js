@@ -74,6 +74,7 @@ async function onOregonContentReceivedAsync(content) {
     var rpId = content.piId;
     sensorData = sensorsMap.get(sensorReading.sensorId);
     if (!sensorData) {
+        console.log("unknown sensor ID:"+sensorReading.sensorId+ " reading:"+JSON.stringify(sensorReading))
         return;
     }
     await sensorData.processNewReadingAsync(sensorReading, rpId);
