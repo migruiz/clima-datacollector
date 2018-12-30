@@ -9,7 +9,7 @@ global.zones= {
     entrance: { sensorId: 'C1', boilerZone: 'downstairs' },  
     masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' }, 
     computerroom: { sensorId: 'C6', boilerZone: 'upstairs'},
-    secondbedroom: { sensorId: 'F1', boilerZone: 'upstairs' },
+    secondbedroom: { sensorId: 'BD', boilerZone: 'upstairs' },
     outside: { sensorId: 'CD' },
 }
 //global.dbPath = 'c:\\temp.sqlite';
