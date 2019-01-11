@@ -8,7 +8,7 @@ global.zones= {
     livingroom: { sensorId: 'FA', boilerZone: 'downstairs'},
     entrance: { sensorId: '79', boilerZone: 'downstairs' },  
     masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' }, 
-    computerroom: { sensorId: 'C6', boilerZone: 'upstairs'},
+    computerroom: { sensorId: 'F6', boilerZone: 'upstairs'},
     secondbedroom: { sensorId: 'BD', boilerZone: 'upstairs' },
     outside: { sensorId: 'CD' },
 }
