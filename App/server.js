@@ -4,7 +4,7 @@ var sensorsCreator = require('./sensor.js');
 const ZoneHistory = require('./ZoneHistory.js');
 
 global.zones= {
-    masterroom: { sensorId: 'C1', boilerZone: 'upstairs' },    
+    masterroom: { sensorId: '62', boilerZone: 'upstairs' },    
     livingroom: { sensorId: 'FA', boilerZone: 'downstairs'},
     entrance: { sensorId: '79', boilerZone: 'downstairs' },  
     masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' }, 
