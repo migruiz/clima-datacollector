@@ -84,6 +84,17 @@ async function onOregonContentReceivedAsync(content) {
 
 async function onOregonRFLINKContentReceivedAsync(content) {
     console.log(JSON.stringify(content))
+    const TEMPHEX = content.TEMP;
+    const TEMPVALSTRING  = TEMPHEX.substring(1,4)
+    const encodedValue = parseInt(TEMPVALSTRING, 16);
+    console.log('deko' , encodedValue)
+
+    var temperatureAbs = encodedValue * 0.1 ;
+    var sign = TEMPHEX.substring(1, 1) === '0' ? 1 : -1;
+    var temperature = sign * temperatureAbs;
+    console.log(temperature)
+
+
 }
 
 
