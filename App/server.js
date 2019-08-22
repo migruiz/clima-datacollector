@@ -79,6 +79,7 @@ async function onOregonContentReceivedAsync(content) {
         console.log("unknown sensor ID:"+sensorReading.sensorId+ " reading:"+JSON.stringify(sensorReading))
         return;
     }
+    console.log(JSON.stringify(sensorReading))
     await sensorData.processNewReadingAsync(sensorReading, rpId);
 }
 
@@ -86,7 +87,6 @@ async function onOregonRFLINKContentReceivedAsync(content) {
     const TEMPHEX = content.TEMP;
     const TEMPVALSTRING  = TEMPHEX.substring(1,4)
     const encodedValue = parseInt(TEMPVALSTRING, 16);
-    console.log('deko' , encodedValue)
 
     var temperatureAbs = encodedValue * 0.1 ;
     var sign = TEMPHEX.substring(0, 1) === '0' ? 1 : -1;
@@ -100,7 +100,7 @@ async function onOregonRFLINKContentReceivedAsync(content) {
         sensorId: content.ID.substring(2,4),
         timeStamp: (new Date).getTime()
     };
-
+    console.log('deko' , JSON.stringify(sensorReading))
 
 
     await sensorData.processNewReadingAsync(sensorReading, 2);
