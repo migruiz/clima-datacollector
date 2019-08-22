@@ -79,7 +79,6 @@ async function onOregonContentReceivedAsync(content) {
         console.log("unknown sensor ID:"+sensorReading.sensorId+ " reading:"+JSON.stringify(sensorReading))
         return;
     }
-    console.log(JSON.stringify(sensorReading))
     await sensorData.processNewReadingAsync(sensorReading, rpId);
 }
 
@@ -100,7 +99,6 @@ async function onOregonRFLINKContentReceivedAsync(content) {
         sensorId: content.ID.substring(2,4),
         timeStamp: Math.round((new Date).getTime() / 1000 )
     };
-    console.log('deko' , JSON.stringify(sensorReading))
     const sensorData = sensorsMap.get(sensorReading.sensorId);
     if (!sensorData) {
         console.log("unknown sensor ID:"+sensorReading.sensorId+ " reading:"+JSON.stringify(sensorReading))
