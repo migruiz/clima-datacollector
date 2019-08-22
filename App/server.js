@@ -18,6 +18,7 @@ global.dbPath = '/ClimaCollectorApp/DB/db.sqlite'
 global.mtqqLocalPath = process.env.MQTTLOCAL;
 //global.mtqqLocalPath = "mqtt://piscos.tk";
 global.sensorReadingTopic = 'sensorReading';
+global.rflinkOregonTopic = 'Oregon TempHygro'
 
 
 var sensorsMap = new Map();
@@ -31,6 +32,7 @@ for (var key in global.zones) {
 (async function(){
     var mqttCluster=await mqtt.getClusterAsync() 
     mqttCluster.subscribeData(global.sensorReadingTopic, onOregonContentReceivedAsync);
+    mqttCluster.subscribeData(global.rflinkOregonTopic, onOregonRFLINKContentReceivedAsync);
     mqttCluster.subscribeData("AllZonesReadingsRequest", OnAllZonesReadingsRequest);
     mqttCluster.subscribeData("AllZonesTemperatureHistoryRequest", OnAllZonesTemperatureHistoryRequest);
 
@@ -80,6 +82,9 @@ async function onOregonContentReceivedAsync(content) {
     await sensorData.processNewReadingAsync(sensorReading, rpId);
 }
 
+async function onOregonRFLINKContentReceivedAsync(content) {
+    console.log(JSON.stringify(content))
+}
 
 
 
