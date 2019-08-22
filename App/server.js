@@ -99,6 +99,7 @@ async function onOregonRFLINKContentReceivedAsync(content) {
     const sensorReading = {
         channel: 33,
         humidity: parseInt(content.HUM),
+        temperature: temperature,
         sensorId: content.ID.substring(2,4),
         timeStamp: (new Date).getTime()
     };
