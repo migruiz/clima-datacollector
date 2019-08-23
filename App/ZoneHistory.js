@@ -9,6 +9,7 @@ class ZoneHistory {
     }
     getTemperatureHistoryList(){
         var output = Object.entries(this.history).map(([key, entry]) => ({timestamp:key,temperature:entry.temperature}));
+        console.log('getTemperatureHistoryList ' + JSON.stringify(output))
         return output
     }
     async initAsync() {
@@ -27,7 +28,7 @@ class ZoneHistory {
     }
 
     async saveIntervalData(lastIntervalStartTime,data){
-        //console.log('saving history ' + JSON.stringify(data))
+        console.log('saving history ' + JSON.stringify(data))
         await sqliteRepository.insertHistoryAsync(this.zoneCode,lastIntervalStartTime,data);
     }
     async removeOldHistory(){
