@@ -74,7 +74,7 @@ class ZoneHistory {
         data.humiditySum=data.humiditySum + reading.humidity
         data.temperature= Math.round( data.temperatureSum/data.readings * 1e1 ) / 1e1 
         data.humidity= Math.round( data.humiditySum/data.readings * 1e1 ) / 1e1 
-        //console.log(this.zoneCode + ' ' + nearestStamp + '    ' + data.readings + ' ' +  data.temperature);
+        console.log(this.zoneCode + ' ' + nearestStamp + '    ' + data.readings + ' ' +  data.temperature);
     }
 }
 module.exports = ZoneHistory;
