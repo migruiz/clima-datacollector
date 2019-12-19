@@ -4,12 +4,12 @@ var sensorsCreator = require('./sensor.js');
 const ZoneHistory = require('./ZoneHistory.js');
 
 global.zones= {
-    masterroom: { sensorId: '6A', boilerZone: 'upstairs' },    
-    livingroom: { sensorId: 'FA', boilerZone: 'downstairs'},
-    entrance: { sensorId: '79', boilerZone: 'downstairs' },  
-    masterbathroom: { sensorId: 'E0', boilerZone: 'upstairs' }, 
-    computerroom: { sensorId: 'F6', boilerZone: 'upstairs'},
-    secondbedroom: { sensorId: 'BD', boilerZone: 'upstairs' },
+    computerrom: { sensorId: '6A', boilerZone: 'upstairs' },    //computerrom
+    ensuite: { sensorId: 'FA', boilerZone: 'downstairs'},  //ensuite
+    kitchen: { sensorId: '79', boilerZone: 'downstairs' },  //kitchen
+    livingroom: { sensorId: 'E0', boilerZone: 'upstairs' }, //livingroom
+    masterroom: { sensorId: 'F6', boilerZone: 'upstairs'},  //masterroom
+    playroom: { sensorId: 'BD', boilerZone: 'upstairs' },  //playroom
     outside: { sensorId: 'CD' },
 }
 //global.dbPath = 'c:\\temp.sqlite';
