@@ -62,7 +62,7 @@ async function OnAllZonesTemperatureHistoryRequest(content) {
     for (var key in global.zones) {
         var history=global.zones[key].history
         var historyEntries=history.getTemperatureHistoryList();
-        zonesHistory.push({zoneCode:key,history:historyEntries})
+        zonesHistory.push({zoneCode:key,order:global.zones[key].order ,history:historyEntries})
     }
     var mqttCluster=await mqtt.getClusterAsync() 
     mqttCluster.publishData("AllZonesTemperatureHistoryResponse",zonesHistory)
