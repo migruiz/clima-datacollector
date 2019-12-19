@@ -1,12 +1,13 @@
 var mqtt = require('./mqttCluster.js');
 var sqliteRepository = require('./sqliteSensorReadingRepository.js');
 var PromiseQueue = require('a-promise-queue');
-function Sensor(zoneCode) {
+function Sensor(zoneCode, order) {
 
     
     var lastReading={
         coverage:"000000",
-        zoneCode:zoneCode
+        zoneCode:zoneCode,
+        order: order
     }
     startNotReceivedTransmissionCountDown();
 
@@ -64,7 +65,7 @@ function Sensor(zoneCode) {
 
 }
 
-exports.newInstance = function (zoneCode) {
-    var instance = new Sensor(zoneCode);
+exports.newInstance = function (zoneCode, order) {
+    var instance = new Sensor(zoneCode, order);
     return instance;
 }

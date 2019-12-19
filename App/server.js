@@ -4,13 +4,13 @@ var sensorsCreator = require('./sensor.js');
 const ZoneHistory = require('./ZoneHistory.js');
 
 global.zones= {
-    computerrom: { sensorId: '6A', boilerZone: 'upstairs' },    //computerrom
-    ensuite: { sensorId: 'FA', boilerZone: 'downstairs'},  //ensuite
-    kitchen: { sensorId: '79', boilerZone: 'downstairs' },  //kitchen
-    livingroom: { sensorId: 'E0', boilerZone: 'upstairs' }, //livingroom
-    masterroom: { sensorId: 'F6', boilerZone: 'upstairs'},  //masterroom
-    playroom: { sensorId: 'BD', boilerZone: 'upstairs' },  //playroom
-    outside: { sensorId: 'CD' },
+    computerrom: { sensorId: '6A', boilerZone: 'upstairs', order:30 },    //computerrom
+    ensuite: { sensorId: 'FA', boilerZone: 'downstairs', order: 21},  //ensuite
+    kitchen: { sensorId: '79', boilerZone: 'downstairs', order: 10 },  //kitchen
+    livingroom: { sensorId: 'E0', boilerZone: 'upstairs', order:11 }, //livingroom
+    masterroom: { sensorId: 'F6', boilerZone: 'upstairs', order: 31},  //masterroom
+    playroom: { sensorId: 'BD', boilerZone: 'upstairs', order: 20 },  //playroom
+    outside: { sensorId: 'CD', order: 1 },
 }
 //global.dbPath = 'c:\\temp.sqlite';
 global.dbPath = '/ClimaCollectorApp/DB/db.sqlite'
@@ -23,7 +23,7 @@ global.rflinkOregonTopic = 'Oregon TempHygro'
 
 var sensorsMap = new Map();
 for (var key in global.zones) {
-    var sensor=sensorsCreator.newInstance(key);
+    var sensor=sensorsCreator.newInstance(key,global.zones[key].order);
     sensorsMap.set(global.zones[key].sensorId,sensor );
     global.zones[key].sensor=sensor;
     global.zones[key].history=new ZoneHistory(key);
